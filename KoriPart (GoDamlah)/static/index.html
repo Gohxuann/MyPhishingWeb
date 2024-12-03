@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VirusTotal Clone</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dark-theme">
+    <div class="min-h-screen flex flex-col">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">Σ</span>
+                <span class="logo-text">VIRUSTOTAL</span>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+                    <i data-lucide="sun"></i>
+                </button>
+                <button class="sign-in">Sign in</button>
+                <button class="sign-up">Sign up</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="search-container">
+                <input type="text" placeholder="URL, IP address, domain or file hash" class="search-input">
+                <button class="search-button">
+                    <i data-lucide="search"></i>
+                </button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="file">FILE</button>
+                <button class="tab" data-tab="url">URL</button>
+                <button class="tab" data-tab="search">SEARCH</button>
+            </div>
+
+            <div class="upload-area">
+                <i data-lucide="file" class="upload-icon"></i>
+                <button class="choose-file">Choose file</button>
+            </div>
+
+            <p class="disclaimer">
+                By submitting data above, you are agreeing to our Terms of Service and Privacy Notice, and to the sharing of your
+                sample submission with the security community. Please do not submit any personal information, we are not
+                responsible for the contents of your submission. <a href="#">Learn more</a>.
+            </p>
+
+            <div class="api-info">
+                Want to automate submissions? <a href="#">Check our API</a>, or access your <a href="#">API key</a>.
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-column">
+                <h3>Our product</h3>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Get Support</a></li>
+                    <li><a href="#">How It Works</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Community</h3>
+                <ul>
+                    <li><a href="#">Join Community</a></li>
+                    <li><a href="#">Vote and Comment</a></li>
+                    <li><a href="#">Contributors</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Tools</h3>
+                <ul>
+                    <li><a href="#">API Scripts</a></li>
+                    <li><a href="#">YARA</a></li>
+                    <li><a href="#">Desktop Apps</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
