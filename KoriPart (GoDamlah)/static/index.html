@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VirusTotal Clone</title>
+    <title>MyPhishfish</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -11,45 +11,58 @@
     <div class="min-h-screen flex flex-col">
         <header>
             <div class="logo">
-                <span class="logo-icon">Σ</span>
-                <span class="logo-text">VIRUSTOTAL</span>
+                <img src="Images/MyphishfishTriallogo.png" alt="Myphishfish Logo" class="logo-img">
+                <span class="logo-text">MYPHISHFISH</span>
             </div>
+            
+            <div class="search-container">
+                <input type="text" placeholder="URL, IP address, domain or file hash" class="search-input">
+            </div>
+            
             <div class="header-right">
+                <i data-lucide="download" class="header-icon"></i>
+                <i data-lucide="message-square" class="header-icon"></i>
+                <i data-lucide="help-circle" class="header-icon"></i>
                 <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
                     <i data-lucide="sun"></i>
                 </button>
-                <button class="sign-in">Sign in</button>
-                <button class="sign-up">Sign up</button>
             </div>
         </header>
 
-        <main>
-            <div class="search-container">
-                <input type="text" placeholder="URL, IP address, domain or file hash" class="search-input">
-                <button class="search-button">
-                    <i data-lucide="search"></i>
-                </button>
+        <main class="main-content">
+            <!-- Title and description -->
+            <div class="hero-text">
+                <h1>Analyse suspicious files, domains, IPs and URLs to detect malware and other</h1>
+                <p>breaches, automatically share them with the security community.</p>
             </div>
 
+            <!-- Tabs -->
             <div class="tabs">
                 <button class="tab active" data-tab="file">FILE</button>
                 <button class="tab" data-tab="url">URL</button>
                 <button class="tab" data-tab="search">SEARCH</button>
+                <button class="tab" data-tab="api"><i data-lucide="code"></i></button>
             </div>
 
+            <!-- Upload area -->
             <div class="upload-area">
-                <i data-lucide="file" class="upload-icon"></i>
+                <div class="upload-icon-wrapper">
+                    <i data-lucide="file-scan" class="upload-icon"></i>
+                </div>
                 <button class="choose-file">Choose file</button>
             </div>
 
-            <p class="disclaimer">
-                By submitting data above, you are agreeing to our Terms of Service and Privacy Notice, and to the sharing of your
-                sample submission with the security community. Please do not submit any personal information, we are not
-                responsible for the contents of your submission. <a href="#">Learn more</a>.
+            <!-- Terms text -->
+            <p class="terms-text">
+                By submitting data above, you are agreeing to our <a href="#">Terms of Service</a> and 
+                <a href="#">Privacy Notice</a>, and to the sharing of your sample submission with the security community. 
+                Please do not submit any personal information; we are not responsible for the contents of your submission. 
+                <a href="#">Learn more</a>.
             </p>
 
+            <!-- API info -->
             <div class="api-info">
-                Want to automate submissions? <a href="#">Check our API</a>, or access your <a href="#">API key</a>.
+                <i data-lucide="info"></i> Want to automate submissions? <a href="#">Check our API</a>, or access your <a href="#">API key</a>.
             </div>
         </main>
 

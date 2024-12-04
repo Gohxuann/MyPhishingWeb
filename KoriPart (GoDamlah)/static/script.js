@@ -6,12 +6,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const sunIcon = `<i data-lucide="sun"></i>`;
     const moonIcon = `<i data-lucide="moon"></i>`;
     
-    let isDarkMode = true;
+    // Initialize theme based on stored preference
+    let isDarkMode = localStorage.getItem('isDarkMode') !== 'false';
+    if (!isDarkMode) {
+        document.body.classList.add('light-theme');
+        themeToggle.innerHTML = moonIcon;
+    } else {
+        themeToggle.innerHTML = sunIcon;
+    }
+    lucide.createIcons();
 
     themeToggle.addEventListener('click', () => {
         isDarkMode = !isDarkMode;
         document.body.classList.toggle('light-theme');
         themeToggle.innerHTML = isDarkMode ? sunIcon : moonIcon;
+        localStorage.setItem('isDarkMode', isDarkMode);
         lucide.createIcons();
     });
 
