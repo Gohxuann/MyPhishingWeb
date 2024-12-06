@@ -254,7 +254,7 @@ footer {
     flex-direction: column;
     align-items: center;
     padding: 2rem max(1rem, calc((100% - var(--max-page-width)) / 2));
-    background-color: #1a1c26;
+    background-color: var(--bg-primary);
     min-height: 80vh;
     width: 100%;
     box-sizing: border-box;
