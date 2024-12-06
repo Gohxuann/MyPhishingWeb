@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     const sunIcon = `<i data-lucide="sun"></i>`;
     const moonIcon = `<i data-lucide="moon"></i>`;
-    
+
     // Initialize theme based on stored preference
     let isDarkMode = localStorage.getItem('isDarkMode') !== 'false';
     if (!isDarkMode) {
@@ -25,13 +25,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Tab switching
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+    // const tabs = document.querySelectorAll('.tab');
+    // tabs.forEach(tab => {
+    //     tab.addEventListener('click', () => {
+    //         tabs.forEach(t => t.classList.remove('active'));
+    //         tab.classList.add('active');
+    //     });
+    // });
+
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetTab = link.getAttribute('data-tab');
+
+            // Remove active class from all links and add to the clicked link
+            navLinks.forEach(nav => nav.classList.remove('active'));
+            link.classList.add('active');
+
+            // Hide all tab contents and display the selected one
+            tabContents.forEach(content => content.style.display = 'none');
+            document.getElementById(`${targetTab}-tab-content`).style.display = 'block';
         });
     });
+
 
     // File upload handling
     const chooseFileBtn = document.querySelector('.choose-file');
