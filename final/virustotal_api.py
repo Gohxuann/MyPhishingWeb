@@ -139,6 +139,7 @@ def parse_response(response):
 
 @app.route("/api", methods=["GET", "POST"])
 def combined_route():
+    malicious = "no"
     if request.method == "GET":
         # Your existing GET handling code
         if "ip" in request.args:
@@ -192,10 +193,12 @@ def combined_route():
             if tot_detect_c > 0:
                 result = f"The IP {ip_add} was rated as {', '.join(result_eng)} on {tot_detect_c} engine(s) out of {tot_engine_c} engines. The engines which reported this are: {', '.join(eng_name)}."
                 result = f"{Gemini(result)}"
-                return jsonify({
-                    "result": result,
-                    "malicious": "yes",
-                })
+                return jsonify(
+                    {
+                        "result": result,
+                        "malicious": "yes",
+                    }
+                )
             else:
                 result = (
                     f"The IP {ip_add} has been marked harmless and clean on VirusTotal."
@@ -203,6 +206,7 @@ def combined_route():
 
             return jsonify(result)
 
+        ################## Scan URL ####################
         elif "url" in request.args:
             url = request.args.get("url")
             if not url:
@@ -228,6 +232,9 @@ def combined_route():
                     for engine, result in analysis_results.items()
                     if result["category"] in ["malicious", "suspicious"]
                 }
+                malicious_count = len(malicious_engines)
+                if malicious_count > 0:
+                    malicious = "yes"
 
                 # Create a summary for Gemini
                 summary = f"""
@@ -241,7 +248,12 @@ def combined_route():
                     """
                 # Pass to Gemini for analysis
                 gemini_response = Gemini(summary)
-                return jsonify(gemini_response)
+                return jsonify(
+                    {
+                        "result": gemini_response,
+                        "malicious": malicious,
+                    }
+                )
             elif response.status_code == 404:
                 headers = {
                     "x-apikey": API_KEY_URL,
@@ -287,7 +299,7 @@ def combined_route():
                         "error": f"Error occurred. Status code: {response.status_code}. Message: {response_data['error']['message']}"
                     }
                 )
-
+    ###################### File Scanning ##############################
     elif request.method == "POST":
         if "file" in request.files:
             file = request.files["file"]
@@ -318,27 +330,71 @@ def combined_route():
                         vt_get_analyses(vt_post_files(file_path, headers), headers),
                         headers,
                     )
-
+                    
+            response_data = json.loads(response.text)
             if response.status_code == 200:
-                parsed_response = parse_response(response)
-                # Prepare summary for Gemini
+                #     malicious_engines = {
+                #         engine: result["result"]
+                #         for engine, result in analysis_results.items()
+                #         if result["category"] in ["malicious", "suspicious"]
+                #     }
+                # malicious_count = len(malicious_engines)
+                # if malicious_count > 0:
+                #     malicious = "yes"
+
+                # parsed_response = parse_response(response)
+                # # Prepare summary for Gemini
+                # summary = f"""
+                # VirusTotal File Analysis Report:
+                # - File Name: {parsed_response.get('name', 'N/A')}
+                # - Total Malicious Detections: {parsed_response['stats'].get('malicious', 0)}
+                # - Total Harmless: {parsed_response['stats'].get('harmless', 0)}
+                # - Total Suspicious: {parsed_response['stats'].get('suspicious', 0)}
+                # - Engines Detected Malicious or Suspicious Results:
+                # """
+                # for engine, result in parsed_response.get(
+                #     "engine_detected", {}
+                # ).items():
+                #     summary += (
+                #         f"\n    - {engine}: {result['category']} ({result['result']})"
+                #     )
+                # # Send the summary to Gemini for explanation
+                # gemini_response = Gemini(summary)
+                # return jsonify(summary), 200
+                attributes = response_data["data"]["attributes"]
+                analysis_results = attributes[
+                    "last_analysis_results"
+                ]  # Detailed engine-wise results
+                stats = attributes["last_analysis_stats"]  # Summary of detections
+
+                # Extract malicious results
+                malicious_engines = {
+                    engine: result["result"]
+                    for engine, result in analysis_results.items()
+                    if result["category"] in ["malicious", "suspicious"]
+                }
+                malicious_count = len(malicious_engines)
+                if malicious_count > 0:
+                    malicious = "yes"
+
+                # Create a summary for Gemini
                 summary = f"""
-                VirusTotal File Analysis Report:
-                - File Name: {parsed_response.get('name', 'N/A')}
-                - Total Malicious Detections: {parsed_response['stats'].get('malicious', 0)}
-                - Total Harmless: {parsed_response['stats'].get('harmless', 0)}
-                - Total Suspicious: {parsed_response['stats'].get('suspicious', 0)}
-                - Engines Detected Malicious or Suspicious Results:
-                """
-                for engine, result in parsed_response.get(
-                    "engine_detected", {}
-                ).items():
-                    summary += (
-                        f"\n    - {engine}: {result['category']} ({result['result']})"
-                    )
-                # Send the summary to Gemini for explanation
+                    VirusTotal File {file} Scan Summary:
+                    - Total Malicious Engines: {stats['malicious']}
+                    - Total Suspicious Engines: {stats['suspicious']}
+                    - Total Engines Scanned: {sum(stats.values())}
+
+                    Engines reporting malicious or suspicious results:
+                    {', '.join([f'{engine}: {result}' for engine, result in malicious_engines.items()])}
+                    """
+                # Pass to Gemini for analysis
                 gemini_response = Gemini(summary)
-                return jsonify(gemini_response), 200
+                return jsonify(
+                    {
+                        "result": gemini_response,
+                        "malicious": malicious,
+                    }
+                )
             else:
                 return jsonify({"error": response.status_code}), response.status_code
 

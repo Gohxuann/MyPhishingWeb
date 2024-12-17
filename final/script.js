@@ -1,5 +1,7 @@
 const API_BASE_URL = "http://127.0.0.1:5000";
 let ipMaliciousCount = 0;
+let urlMaliciousCount = 0;
+let fileMaliciousCount = 0;
 
 // Function to show the correct page
 function showPage(pageId) {
@@ -27,9 +29,12 @@ function uploadFile() {
     })
         .then(response => response.json())
         .then(data => {
-            if (typeof data === 'string') {
+            if(data.malicious === 'yes'){
+                fileMaliciousCount += 1; 
+            }
+            if (typeof data.result === 'string') {
                 // Replace \n with <br> and **bold** with <strong>
-                resultElement.innerHTML = data
+                resultElement.innerHTML = data.result
                     .replace(/\n/g, '<br>')                    // Replace newlines with <br>
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
             } else {
@@ -58,9 +63,12 @@ function scanURL() {
     fetch(`${API_BASE_URL}/api?url=${encodeURIComponent(url)}`)
         .then(response => response.json())
         .then(data => {
-            if (typeof data === 'string') {
+            if(data.malicious === 'yes'){
+                urlMaliciousCount += 1; 
+            }
+            if (typeof data.result === 'string') {
                 // Replace \n with <br> and **bold** with <strong>
-                resultElement.innerHTML = data
+                resultElement.innerHTML = data.result
                     .replace(/\n/g, '<br>')                    // Replace newlines with <br>
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
             } else {
