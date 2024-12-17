@@ -11,8 +11,8 @@
             <button id="dashboardButton">Dashboard</button>
             <button id="fileUploadButton">File Upload</button>
             <button id="urlIpScanButton">URL/IP Scanning</button>
-            <button id="reportIpUrlButton">URL/IP Scanning</button>
-            <button id="QuizPageButton">URL/IP Scanning</button>
+            <button id="reportIpUrlButton">URL/IP Reporting</button>
+            <button id="QuizPageButton">Quiz Page</button>
         </nav>
     </div>
 
@@ -42,7 +42,8 @@
             </div>
         </div>
         <div style="text-align: center; margin-top: 20px;">
-            <button onclick="fetchDashboardData()">Refresh Data</button>
+            <button id="refreshDashboard">Refresh</button>
+            
         </div>
     </div>
 
@@ -50,7 +51,7 @@
         <h2>File Upload</h2>
         <div class="input-group">
             <input type="file" id="fileInput">
-            <button onclick="uploadFile()">Upload File</button>
+            <button id="uploadFileButton">Upload File</button>
         </div>
         <p id="fileUploadResult"></p>
     </div>
@@ -58,15 +59,15 @@
     <div id="urlIpScanPage" class="page">
         <h2>URL/IP Scanning</h2>
         <nav style="margin-bottom: 20px; display: flex; gap: 10px;">
-            <button onclick="toggleSection('urlScanSection')">URL Scanning</button>
-            <button onclick="toggleSection('ipScanSection')">IP Scanning</button>
+            <button id="toggleUrlScan">URL Scanning</button>
+            <button id="toggleIpScan">IP Scanning</button>
         </nav>
         
         <div id="urlScanSection" class="scan-section">
             <h3>URL Scanning</h3>
             <div class="input-group">
                 <input type="text" id="urlInput" placeholder="Enter URL">
-                <button onclick="scanURL()">Scan URL</button>
+                <button id="scanUrlButton">Scan URL</button>
             </div>
             <p id="urlScanResult"></p>
         </div>
@@ -75,7 +76,7 @@
             <h3>IP Scanning</h3>
             <div class="input-group">
                 <input type="text" id="ipInput" placeholder="Enter IP Address">
-                <button onclick="scanIP()">Scan IP</button>
+                <button id="scanIpButton">Scan IP</button>
             </div>
             <p id="ipScanResult"></p>
         </div>
@@ -84,15 +85,15 @@
     <div id="reportIpUrlPage" class="page">
         <h2>Report IP/URL</h2>
         <nav style="margin-bottom: 20px; display: flex; gap: 10px;">
-            <button onclick="toggleSection2('reportIpSection')">Report IP</button>
-            <button onclick="toggleSection2('reportUrlSection')">Report URL</button>
+            <button id="toggleReportIp">Report IP</button>
+            <button id="toggleReportUrl">Report URL</button>
         </nav>
         
         <div id="reportIpSection" class="report-section">
             <h3>Report IP</h3>
             <div class="input-group">
                 <input type="text" id="reportIpInput" placeholder="Enter IP to Report">
-                <button onclick="reportIP()">Report IP</button>
+                <button id="reportIpButton">Report IP</button>
             </div>
             <p id="reportIpResult"></p>
         </div>
@@ -101,7 +102,7 @@
             <h3>Report URL</h3>
             <div class="input-group">
                 <input type="text" id="reportUrlInput" placeholder="Enter URL to Report">
-                <button onclick="reportURL()">Report URL</button>
+                <button id="reportUrlButton">Report URL</button>
             </div>
             <p id="reportUrlResult"></p>
         </div>

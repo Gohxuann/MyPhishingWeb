@@ -3,9 +3,56 @@ let ipMaliciousCount = 0;
 let urlMaliciousCount = 0;
 let fileMaliciousCount = 0;
 
+// File upload
+document.addEventListener("DOMContentLoaded", () => {
+    // Event listener for file upload
+    document.getElementById("uploadFileButton").addEventListener("click", uploadFile);
+
+    // File upload function
+    function uploadFile() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        const resultElement = document.getElementById('fileUploadResult');
+
+        if (!file) {
+            resultElement.textContent = "Please select a file to upload.";
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch(`${API_BASE_URL}/api`, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.malicious === 'yes') {
+                    fileMaliciousCount += 1;
+                }
+                if (typeof data.result === 'string') {
+                    // Replace \n with <br> and **bold** with <strong>
+                    resultElement.innerHTML = data.result
+                        .replace(/\n/g, '<br>')                    // Replace newlines with <br>
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
+                } else {
+                    // Format JSON data and replace formatting
+                    resultElement.innerHTML = JSON.stringify(data, null, 2)
+                        .replace(/\n/g, '<br>')                    // Replace newlines with <br>
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
+                }
+            })
+            .catch(error => {
+                resultElement.textContent = `Error: ${error}`;
+                console.error("Upload Error:", error);
+            });
+    }
+});
 
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Function to show the correct page
     const showPage = (pageId) => {
         document.querySelectorAll('.page').forEach(page => {
             page.classList.remove('active');
@@ -13,207 +60,141 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById(pageId).classList.add('active');
     };
 
-    document.getElementById("dashboardButton").addEventListener("click", () => {
-        showPage('dashboardPage');
+    // Navigation buttons
+    document.getElementById("dashboardButton").addEventListener("click", () => showPage('dashboardPage'));
+    document.getElementById("fileUploadButton").addEventListener("click", () => showPage('fileUploadPage'));
+    document.getElementById("urlIpScanButton").addEventListener("click", () => showPage('urlIpScanPage'));
+    document.getElementById("reportIpUrlButton").addEventListener("click", () => showPage('reportIpUrlPage'));
+    document.getElementById("QuizPageButton").addEventListener("click", () => showPage('QuizPage'));
+
+    // Toggle URL/IP Scanning sections
+    document.getElementById("toggleUrlScan").addEventListener("click", () => {
+        toggleSection('urlScanSection');
     });
 
-    document.getElementById("fileUploadButton").addEventListener("click", () => {
-        showPage('fileUploadPage');
+    document.getElementById("toggleIpScan").addEventListener("click", () => {
+        toggleSection('ipScanSection');
     });
 
-    document.getElementById("urlIpScanButton").addEventListener("click", () => {
-        showPage('urlIpScanPage');
+    // Toggle Report IP/URL sections
+    document.getElementById("toggleReportIp").addEventListener("click", () => {
+        toggleSection('reportIpSection');
     });
-    document.getElementById("reportIpUrlButton").addEventListener("click", () => {
-        showPage('reportIpUrlPage');
+
+    document.getElementById("toggleReportUrl").addEventListener("click", () => {
+        toggleSection('reportUrlSection');
     });
-    document.getElementById("QuizPageButton").addEventListener("click", () => {
-        showPage('QuizPage');
+
+    // URL Scanning
+    document.getElementById("scanUrlButton").addEventListener("click", () => {
+        const url = document.getElementById("urlInput").value.trim();
+        const urlScanResult = document.getElementById("urlScanResult");
+
+        if (url) {
+            fetch(`${API_BASE_URL}/api?url=${encodeURIComponent(url)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.malicious === 'yes') {
+                        urlMaliciousCount += 1;
+                    }
+                    urlScanResult.innerHTML = data.result
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                })
+                .catch(err => {
+                    urlScanResult.textContent = "Error scanning URL.";
+                    console.error(err);
+                });
+        } else {
+            urlScanResult.textContent = "Please enter a valid URL.";
+        }
     });
+
+    // IP Scanning
+    document.getElementById("scanIpButton").addEventListener("click", () => {
+        const ip = document.getElementById("ipInput").value.trim();
+        const ipScanResult = document.getElementById("ipScanResult");
+
+        if (ip) {
+            fetch(`${API_BASE_URL}/api?ip=${encodeURIComponent(ip)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.malicious === 'yes') {
+                        ipMaliciousCount += 1;
+                    }
+                    ipScanResult.innerHTML = data.result
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                })
+                .catch(err => {
+                    ipScanResult.textContent = "Error scanning IP.";
+                    console.error(err);
+                });
+        } else {
+            ipScanResult.textContent = "Please enter a valid IP.";
+        }
+    });
+
+    // Report IP
+    document.getElementById("reportIpButton").addEventListener("click", () => {
+        const ip = document.getElementById('reportIpInput').value;
+        const resultElement = document.getElementById('reportIpResult');
+    
+        if (!ip) {
+            resultElement.textContent = "Please enter an IP address to report.";
+            return;
+        }
+    
+        fetch(`${API_BASE_URL}/report-ip`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ip })
+        })
+            .then(response => response.json())
+            .then(data => {
+                resultElement.textContent = JSON.stringify(data, null, 2).replace(/^"(.*)"$/, '$1');
+            })
+            .catch(error => {
+                resultElement.textContent = `Error: ${error}`;
+            });
+    });
+
+    // Report URL
+    document.getElementById("reportUrlButton").addEventListener("click", () => {
+        const url = document.getElementById("reportUrlInput").value.trim();
+        const reportUrlResult = document.getElementById("reportUrlResult");
+
+        if (url) {
+            fetch(`${API_BASE_URL}/report-url`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    reportUrlResult.innerHTML = data
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                })
+                .catch(err => {
+                    reportUrlResult.textContent = "Error reporting URL.";
+                    console.error(err);
+                });
+        } else {
+            reportUrlResult.textContent = "Please enter a valid URL.";
+        }
+    });
+
+    // Dashboard refresh
+    document.getElementById("refreshDashboard").addEventListener("click", fetchDashboardData);
 });
 
-// Function to show the correct page
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-}
-//scan toggle
+// Function to toggle between sections
 function toggleSection(sectionId) {
-    // Hide all scan sections
-    const sections = document.querySelectorAll('.scan-section');
-    sections.forEach(section => section.style.display = 'none');
-
-    // Show the selected section
+    document.querySelectorAll('.scan-section, .report-section').forEach(section => {
+        section.style.display = 'none';
+    });
     document.getElementById(sectionId).style.display = 'block';
-}
-
-//report toggle
-function toggleSection2(sectionId) {
-    // Hide all report sections
-    const sections = document.querySelectorAll('.report-section');
-    sections.forEach(section => section.style.display = 'none');
-
-    // Show the selected section
-    document.getElementById(sectionId).style.display = 'block';
-}
-
-
-
-// File upload
-function uploadFile() {
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
-    const resultElement = document.getElementById('fileUploadResult');
-
-    if (!file) {
-        resultElement.textContent = "Please select a file to upload.";
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    fetch(`${API_BASE_URL}/api`, {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => response.json())
-        .then(data => {
-            if(data.malicious === 'yes'){
-                fileMaliciousCount += 1; 
-            }
-            if (typeof data.result === 'string') {
-                // Replace \n with <br> and **bold** with <strong>
-                resultElement.innerHTML = data.result
-                    .replace(/\n/g, '<br>')                    // Replace newlines with <br>
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
-            } else {
-                // Format JSON data and replace formatting
-                resultElement.innerHTML = JSON.stringify(data, null, 2)
-                    .replace(/\n/g, '<br>')                    // Replace newlines with <br>
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
-            }
-
-        })
-        .catch(error => {
-            resultElement.textContent = `Error: ${error}`;
-        });
-}
-
-// URL scanning
-function scanURL() {
-    const url = document.getElementById('urlInput').value;
-    const resultElement = document.getElementById('urlScanResult');
-
-    if (!url) {
-        resultElement.textContent = "Please enter a URL to scan.";
-        return;
-    }
-
-    fetch(`${API_BASE_URL}/api?url=${encodeURIComponent(url)}`)
-        .then(response => response.json())
-        .then(data => {
-            if(data.malicious === 'yes'){
-                urlMaliciousCount += 1; 
-            }
-            if (typeof data.result === 'string') {
-                // Replace \n with <br> and **bold** with <strong>
-                resultElement.innerHTML = data.result
-                    .replace(/\n/g, '<br>')                    // Replace newlines with <br>
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
-            } else {
-                // Format JSON data and replace formatting
-                resultElement.innerHTML = JSON.stringify(data, null, 2)
-                    .replace(/\n/g, '<br>')                    // Replace newlines with <br>
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
-            }
-
-        })
-        .catch(error => {
-            resultElement.textContent = `Error: ${error}`;
-        });
-}
-
-// IP scanning
-function scanIP() {
-    const ip = document.getElementById('ipInput').value;
-    const resultElement = document.getElementById('ipScanResult');
-
-    if (!ip) {
-        resultElement.textContent = "Please enter an IP address to scan.";
-        return;
-    }
-
-    fetch(`${API_BASE_URL}/api?ip=${encodeURIComponent(ip)}`)
-        .then(response => response.json())
-        .then(data => {
-            if(data.malicious === 'yes'){
-                ipMaliciousCount += 1; 
-            }
-
-            if (typeof data.result === 'string') {
-                // Replace \n with <br> and **bold** with <strong>
-                resultElement.innerHTML = data.result
-                    .replace(/\n/g, '<br>')                    // Replace newlines with <br>
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
-            } else {
-                // Format JSON data and replace formatting
-                resultElement.innerHTML = JSON.stringify(data, null, 2)
-                    .replace(/\n/g, '<br>')                    // Replace newlines with <br>
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
-            }
-
-        })
-        .catch(error => {
-            resultElement.textContent = `Error: ${error}`;
-        });
-}
-
-// Report IP
-function reportIP() {
-    const ip = document.getElementById('reportIpInput').value;
-    const resultElement = document.getElementById('reportIpResult');
-
-    if (!ip) {
-        resultElement.textContent = "Please enter an IP address to report.";
-        return;
-    }
-
-    fetch(`${API_BASE_URL}/report-ip`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ip })
-    })
-        .then(response => response.json())
-        .then(data => {
-            resultElement.textContent = JSON.stringify(data, null, 2).replace(/^"(.*)"$/, '$1');
-        })
-        .catch(error => {
-            resultElement.textContent = `Error: ${error}`;
-        });
-}
-
-function reportURL() {
-    const url = document.getElementById('reportUrlInput').value;
-    const resultElement = document.getElementById('reportUrlResult');
-
-    if (!url) {
-        resultElement.textContent = "Please enter an IP address to report.";
-        return;
-    }
-
-    fetch(`${API_BASE_URL}/report-url`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
-    })
-        .then(response => response.json())
-        .then(data => {
-            resultElement.textContent = JSON.stringify(data, null, 2).replace(/^"(.*)"$/, '$1');
-        })
-        .catch(error => {
-            resultElement.textContent = `Error: ${error}`;
-        });
 }
 
 
