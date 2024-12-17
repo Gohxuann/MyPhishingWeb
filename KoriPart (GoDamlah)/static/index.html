@@ -1,56 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VirusTotal Clone</title>
+    <title>MyPhishfish</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="script.js" defer></script>
 </head>
+
 <body class="dark-theme">
     <div class="min-h-screen flex flex-col">
-        <header>
-            <div class="logo">
-                <span class="logo-icon">Σ</span>
-                <span class="logo-text">VIRUSTOTAL</span>
+        <header class="header">
+            <div class="nav-left">
+                <div class="logo">
+                    <img src="Images/MyphishfishTriallogo.png" alt="Myphishfish Logo" class="logo-img">
+                    <span class="logo-text">MYPHISHFISH</span>
+                </div>
+
+                <div class="search-container">
+                    <input type="text" placeholder="URL, IP address, domain or file hash" class="search-input">
+                </div>
+
+                <i data-lucide="download" class="header-icon"></i>
             </div>
-            <div class="header-right">
+            <ul class="nav-links">
+                <li><a href="#" data-tab="main" class="active">URLs/IPs Scanning</a></li>
+                <li><a href="#" data-tab="report">Report Phishing</a></li>
+                <li><a href="#" data-tab="file">File/Folder Scanning</a></li>
+                <li><a href="#" data-tab="visualize">Visualize Model</a></li>
+                <li><a href="#" data-tab="game">Game</a></li>
+            </ul>
+            <div class="nav-right">
+                <i data-lucide="message-square" class="header-icon"></i>
+                <i data-lucide="help-circle" class="header-icon"></i>
                 <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
-                    <i data-lucide="sun"></i>
+                    <i data-lucide="sun" class="header-icon"></i>
                 </button>
-                <button class="sign-in">Sign in</button>
-                <button class="sign-up">Sign up</button>
             </div>
         </header>
 
-        <main>
-            <div class="search-container">
-                <input type="text" placeholder="URL, IP address, domain or file hash" class="search-input">
-                <button class="search-button">
-                    <i data-lucide="search"></i>
-                </button>
+        <main class="main-content" id="main-content">
+            <!-- Default Content: Urls/Ips Scaning Screen Content-->
+            <div class="tab-content" id="main-tab-content">
+                <h2>Urls/Ips Scanning</h2>
+                <p>Enter a URL or IP address to check if it is phishing or not.</p>
             </div>
 
-            <div class="tabs">
-                <button class="tab active" data-tab="file">FILE</button>
-                <button class="tab" data-tab="url">URL</button>
-                <button class="tab" data-tab="search">SEARCH</button>
+            <!-- Report Phishing Content -->
+            <!-- <div class="tab-content" id="report-tab-content" style="display: none;">
+                <h2>Report Phishing</h2>
+                <p>Report any suspicious URL or email here.</p>
+            </div> -->
+
+            <div class="tab-content" id="report-tab-content" style="display: none;">
+                <h2 class="section-title">Report Phishing</h2>
+                <p>Analyze and report any suspicious URL or IP address to improve cybersecurity awareness.</p>
+            
+                <div class="form-container">
+                    <form id="report-form">
+                        <div class="input-group">
+                            <label for="report-ip-input">Enter URL or IP Address:</label>
+                            <input type="text" id="report-ip-input" placeholder="e.g., 192.168.1.1 or https://example.com" required>
+                        </div>
+                        <button type="submit" class="btn-submit">Scan and Report</button>
+                    </form>
+                </div>
+            
+                <!-- Loader -->
+                <div id="loader" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Scanning in progress...</p>
+                </div>
+            
+                <!-- Results -->
+                <div id="report-result" class="result-container"></div>
+            </div>
+            
+            
+            <!-- File/Folder Scanning Content -->
+            <div class="tab-content" id="file-tab-content"  style="display: none; text-align: center;">
+                <div class="hero-text" style="max-width: 800px; margin: 0 auto;">
+                    <h1>Analyse suspicious files, domains, IPs and URLs to detect malware and other</h1>
+                    <p>breaches, automatically share them with the security community.</p>
+                </div>
+
+                <!-- Tabs -->
+                <!-- <div class="tabs" >
+                    <button class="tab active" data-tab="file">FILE</button>
+                    <button class="tab" data-tab="url">URL</button>
+                    <button class="tab" data-tab="search">SEARCH</button>
+                    <button class="tab" data-tab="api"><i data-lucide="code"></i></button>
+                </div> -->
+
+                <!-- Upload area -->
+                <div class="upload-area" style="max-width: 400px; margin: 2rem auto;">
+                    <div class="upload-icon-wrapper">
+                        <i data-lucide="file-scan" class="upload-icon"></i>
+                    </div>
+                    <button class="choose-file">Choose file</button>
+                </div>
+
+                <!-- Terms text -->
+                <p class="terms-text" style="max-width: 800px; margin: 2rem auto;">
+                    By submitting data above, you are agreeing to our <a href="#">Terms of Service</a> and
+                    <a href="#">Privacy Notice</a>, and to the sharing of your sample submission with the security
+                    community.
+                    Please do not submit any personal information; we are not responsible for the contents of your
+                    submission.
+                    <a href="#">Learn more</a>.
+                </p>
+
+                <!-- API info -->
+                <div class="api-info" style="max-width: 800px; margin: 2rem auto;">
+                    <i data-lucide="info"></i> Want to automate submissions? <a href="#">Check our API</a>, or access
+                    your <a href="#">API key</a>.
+                </div>
             </div>
 
-            <div class="upload-area">
-                <i data-lucide="file" class="upload-icon"></i>
-                <button class="choose-file">Choose file</button>
+            <!-- Visualize Model Content -->
+            <div class="tab-content" id="visualize-tab-content" style="display: none;">
+                <h2>Visualize Model</h2>
+                <p>Visual representation of our phishing detection model.</p>
             </div>
 
-            <p class="disclaimer">
-                By submitting data above, you are agreeing to our Terms of Service and Privacy Notice, and to the sharing of your
-                sample submission with the security community. Please do not submit any personal information, we are not
-                responsible for the contents of your submission. <a href="#">Learn more</a>.
-            </p>
-
-            <div class="api-info">
-                Want to automate submissions? <a href="#">Check our API</a>, or access your <a href="#">API key</a>.
+            <!-- Game Content -->
+            <div class="tab-content" id="game-tab-content" style="display: none;">
+                <h2>Game</h2>
+                <p>Learn about phishing by playing our interactive game!</p>
             </div>
+
         </main>
 
         <footer>
@@ -80,6 +160,7 @@
             </div>
         </footer>
     </div>
-    <script src="script.js"></script>
+
 </body>
+
 </html>
