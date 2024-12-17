@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Sentinel Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            background: #333;
+            color: #fff;
+            display: flex;
+            padding: 10px;
+        }
+
+        nav button {
+            background: #444;
+            border: none;
+            color: #fff;
+            padding: 10px 15px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        nav button:hover {
+            background: #555;
+        }
+
+        .page {
+            display: none;
+            padding: 20px;
+        }
+
+        .active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <button onclick="showPage('dashboardPage')">Dashboard</button>
+        <button onclick="showPage('fileUploadPage')">File Upload</button>
+        <button onclick="showPage('urlIpScanPage')">URL/IP Scanning</button>
+        <button onclick="showPage('reportIpUrlPage')">Report URL/IP</button>
+        <button onclick="showPage('QuizPage')">Play Quiz to Learn About Malware</button>
+    </nav>
+    <div id="dashboardPage" class="page active">
+        <h2>Malicious Detection Dashboard</h2>
+        <div style="display: flex; justify-content: space-around; text-align: center;">
+            <div>
+                <svg width="100" height="100">
+                    <circle cx="50" cy="50" r="40" stroke="red" stroke-width="3" fill="none" />
+                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="20" id="fileCount">0</text>
+                </svg>
+                <p>File Scans</p>
+            </div>
+            <div>
+                <svg width="100" height="100">
+                    <circle cx="50" cy="50" r="40" stroke="orange" stroke-width="3" fill="none" />
+                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="20" id="urlCount">0</text>
+                </svg>
+                <p>URL Scans</p>
+            </div>
+            <div>
+                <svg width="100" height="100">
+                    <circle cx="50" cy="50" r="40" stroke="blue" stroke-width="3" fill="none" />
+                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="20" id="ipCount">0</text>
+                </svg>
+                <p>IP Scans</p>
+            </div>
+        </div>
+        <button onclick="fetchDashboardData()">Refresh</button>
+    </div>
+
+
+    <div id="fileUploadPage" class="page">
+        <h2>File Upload</h2>
+        <input type="file" id="fileInput">
+        <button onclick="uploadFile()">Upload File</button>
+        <p id="fileUploadResult"></p>
+    </div>
+
+    <div id="urlIpScanPage" class="page">
+        <h2>URL/IP Scanning</h2>
+        <input type="text" id="urlInput" placeholder="Enter URL">
+        <button onclick="scanURL()">Scan URL</button>
+        <p id="urlScanResult"></p>
+        <br><br>
+        <input type="text" id="ipInput" placeholder="Enter IP Address">
+        <button onclick="scanIP()">Scan IP</button>
+        <p id="ipScanResult"></p>
+    </div>
+
+    <div id="reportIpUrlPage" class="page">
+        <h2>Report IP</h2>
+        <input type="text" id="reportIpInput" placeholder="Enter IP to Report">
+        <button onclick="reportIP()">Report IP</button>
+        <p id="reportIpResult"></p>
+        <br><br>
+        <h2>Report URL</h2>
+        <input type="text" id="reportUrlInput" placeholder="Enter URL to Report">
+        <button onclick="reportURL()">Report URL</button>
+        <p id="reportUrlResult"></p>
+    </div>
+
+    <div id="QuizPage" class="page">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f9f9f9;
+            }
+
+            header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background-color: #333;
+                color: white;
+                padding: 10px 20px;
+            }
+
+            header h1 {
+                margin: 0;
+            }
+
+            #score {
+                font-size: 18px;
+                color: #ffd700;
+            }
+
+            .container {
+                margin: 20px auto;
+                padding: 20px;
+                max-width: 600px;
+                background-color: white;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .question {
+                margin-bottom: 15px;
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+            .options button {
+                display: block;
+                width: 100%;
+                margin: 5px 0;
+                padding: 10px;
+                border: 1px solid #ddd;
+                background-color: #f0f0f0;
+                cursor: pointer;
+                font-size: 16px;
+                border-radius: 5px;
+            }
+
+            .options button:hover {
+                background-color: #ddd;
+            }
+
+            #playAgain {
+                display: none;
+                margin-top: 20px;
+                background-color: #28a745;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                cursor: pointer;
+                font-size: 16px;
+                border-radius: 5px;
+            }
+
+            #playAgain:hover {
+                background-color: #218838;
+            }
+        </style>
+        <header>
+            <h1>Malware Quiz</h1>
+            <div id="score">Score: 0 / 10</div>
+        </header>
+
+        <div class="container">
+            <div id="quizContent">
+                <!-- Questions will appear here -->
+            </div>
+            <button id="playAgain" onclick="playAgain()" style="display: none;">Play Again</button>
+        </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>

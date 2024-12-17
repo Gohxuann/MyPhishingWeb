@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Cyber Sentinel Extension",
+  "version": "1.0",
+  "description": "Detect URL clicks and interact with backend APIs in real-time.",
+  "permissions": [
+    "tabs",
+    "webRequest", 
+    "activeTab",
+    "storage",
+    "notifications"  
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:5000/*",  
+    "<all_urls>"  
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Cyber Sentinel"
+  },
+  "icons": {
+    "128": "icon.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; connect-src http://127.0.0.1:5000"
+  }
+}
