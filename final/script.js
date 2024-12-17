@@ -3,11 +3,61 @@ let ipMaliciousCount = 0;
 let urlMaliciousCount = 0;
 let fileMaliciousCount = 0;
 
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const showPage = (pageId) => {
+        document.querySelectorAll('.page').forEach(page => {
+            page.classList.remove('active');
+        });
+        document.getElementById(pageId).classList.add('active');
+    };
+
+    document.getElementById("dashboardButton").addEventListener("click", () => {
+        showPage('dashboardPage');
+    });
+
+    document.getElementById("fileUploadButton").addEventListener("click", () => {
+        showPage('fileUploadPage');
+    });
+
+    document.getElementById("urlIpScanButton").addEventListener("click", () => {
+        showPage('urlIpScanPage');
+    });
+    document.getElementById("reportIpUrlButton").addEventListener("click", () => {
+        showPage('reportIpUrlPage');
+    });
+    document.getElementById("QuizPageButton").addEventListener("click", () => {
+        showPage('QuizPage');
+    });
+});
+
 // Function to show the correct page
 function showPage(pageId) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
 }
+//scan toggle
+function toggleSection(sectionId) {
+    // Hide all scan sections
+    const sections = document.querySelectorAll('.scan-section');
+    sections.forEach(section => section.style.display = 'none');
+
+    // Show the selected section
+    document.getElementById(sectionId).style.display = 'block';
+}
+
+//report toggle
+function toggleSection2(sectionId) {
+    // Hide all report sections
+    const sections = document.querySelectorAll('.report-section');
+    sections.forEach(section => section.style.display = 'none');
+
+    // Show the selected section
+    document.getElementById(sectionId).style.display = 'block';
+}
+
+
 
 // File upload
 function uploadFile() {
