@@ -13,9 +13,9 @@ import google.generativeai as genai
 app = Flask(__name__)
 CORS(app)
 
-API_KEY_IP = "7f7fe9f967c41cc8c382dc4f7b7b4f33c1940e84ea205570f7adde9f5e6931a9"
-API_KEY_URL = "25908485d1d7ca338d0e1427d00801a2180bc0090d165a60df8ce2703b88a697"
-API_KEY_FILE = "b221c495a4e5654c82fbc7928804bf665d0b04d1ece9818e453c92fe8f5664a6"
+API_KEY_IP = "YOUR_OWN_APIKEY"
+API_KEY_URL = "YOUR_OWN_APIKEY"
+API_KEY_FILE = "YOUR_OWN_APIKEY"
 
 
 def get_analysis_stats(stats):
@@ -402,7 +402,7 @@ def combined_route():
 
 
 API_KEY = (
-    "540b085d3aeaaf314c12ae782b31c5b5ae1740db7466c5406bf33b2ab051a63276b540624d9b534e"
+    "YOUR_OWN_APIKEY"
 )
 URL = "https://www.abuseipdb.com/api/v2/report"
 
@@ -441,7 +441,7 @@ def report_ip():
     return jsonify({"error": "Method not allowed"}), 405
 
 
-api_key = "044059af024c688ff5839ad7579e738191a7712b48ae0ec3"
+api_key = "YOUR_OWN_APIKEY"
 
 
 @app.route("/report-url", methods=["POST"])
@@ -490,7 +490,7 @@ def report_url():
 
 
 def Gemini(text):
-    genai.configure(api_key="AIzaSyDTmeDd54h1oEm7andz_MvsRfkbeBn7va0")
+    genai.configure(api_key="YOUR_OWN_APIKEY")
     model = genai.GenerativeModel("gemini-1.5-flash")
     explaination = (
         "Can you explain about the report in VirusTotal? The first paragraph of the report is explaination of the report. Second paragraph is stractegic to prevent. Format only with two bold text such as Explaination and Stractegic. Dont't repeat this sentences, just start to your explaination.\n"
