@@ -80,16 +80,13 @@ final/
 ├── backend/
 │   └── virustotal_api.py     # Backend Flask server for handling API requests
 │
-├── frontend/
-│   ├── index.html            # Main HTML page for the user interface
-│   ├── style.css             # Styling for the frontend interface
-│   ├── script.js             # JavaScript for managing frontend functionality
-│   └── MyphishfishTriallogo.png  # Logo image for the project
-│
 ├── chrome_extension/
 │   ├── manifest.json         # Chrome extension configuration
 │   ├── background.js         # Background script for Chrome extension URL monitoring
-│   └── icon.png              # Extension icon
+│   ├── icon.png              # Extension icon│   ├── index.html            # Main HTML page for the user interface
+│   ├── style.css             # Styling for the frontend interface
+│   ├── script.js             # JavaScript for managing frontend functionality
+│   └── MyphishfishTriallogo.png  # Logo image for the project
 │
 └── README.md                 # Documentation for setup and usage
 ```
