@@ -66,9 +66,9 @@ Follow these steps to load and run the Chrome extension:
 ---
 
 ## APIs Used
-- VirusTotal API: For file and IP scanning.
-- URLhaus API: For malicious URL detection.
-- AbuseIPDB API: For IP address evaluation and reporting.
+- VirusTotal API: For file, URL and IP scanning.
+- URLhaus API: For malicious URL reporting.
+- AbuseIPDB API: For IP address reporting.
 - Gemini LLM: For AI-generated human-readable explanations.
 
 ---
