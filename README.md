@@ -24,7 +24,7 @@ Follow the steps below to set up and run the MyPhishFish system:
    ```bash
    python virustotal_api.py
    ```
-   - This starts the Flask server, which integrates with the VirusTotal, URLhaus, and AbuseIPDB APIs.
+   - This starts the Flask server, which integrates with the Gemini, VirusTotal, URLhaus, and AbuseIPDB APIs.
   
 ### **2. Frontend Setup**
 1. Locate the `index.html` file in the project folder.
