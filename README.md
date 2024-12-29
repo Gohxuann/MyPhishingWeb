@@ -107,5 +107,4 @@ Project: GoDamLah Hackathon Submission
   - Muhammad Abqari
   - Lim Jia Shin
   - Lee Yung Jie
-  - Goh Hong Xuan
  
