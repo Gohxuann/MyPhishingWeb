@@ -65,7 +65,7 @@ Follow these steps to load and run the Chrome extension:
 
 ---
 
-## APIs Used
+## APIs Used - Use your own api key
 - VirusTotal API: For file, URL and IP scanning.
 - URLhaus API: For malicious URL reporting.
 - AbuseIPDB API: For IP address reporting.
@@ -107,5 +107,4 @@ Project: GoDamLah Hackathon Submission
   - Muhammad Abqari
   - Lim Jia Shin
   - Lee Yung Jie
-  - Goh Hong Xuan
  
