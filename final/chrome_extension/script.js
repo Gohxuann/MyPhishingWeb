@@ -3,26 +3,112 @@ let ipMaliciousCount = 0;
 let urlMaliciousCount = 0;
 let fileMaliciousCount = 0;
 
+// Add these helper functions at the top of your script.js file
+function showSpinner(buttonId) {
+    const spinner = document.getElementById(`${buttonId}Spinner`);
+    const button = document.getElementById(buttonId);
+    if (spinner && button) {
+        spinner.style.display = 'inline-block';
+        button.disabled = true;
+    }
+}
+
+function hideSpinner(buttonId) {
+    const spinner = document.getElementById(`${buttonId}Spinner`);
+    const button = document.getElementById(buttonId);
+    if (spinner && button) {
+        spinner.style.display = 'none';
+        button.disabled = false;
+    }
+}
+
+function showLoading(loadingId, resultId) {
+    const loadingContainer = document.getElementById(loadingId);
+    const resultElement = document.getElementById(resultId);
+    resultElement.textContent = ''; // Clear previous results
+    resultElement.classList.remove('visible');
+    loadingContainer.style.display = 'block';
+    loadingContainer.classList.remove('fade-out');
+}
+
+function hideLoading(loadingId, resultId) {
+    const loadingContainer = document.getElementById(loadingId);
+    const resultElement = document.getElementById(resultId);
+    loadingContainer.classList.add('fade-out');
+    
+    setTimeout(() => {
+        loadingContainer.style.display = 'none';
+        loadingContainer.classList.remove('fade-out');
+        resultElement.classList.add('visible');
+    }, 500);
+}
+
+// Add these loading handler functions
+function showFileLoading() {
+    showLoading('loadingContainer', 'fileUploadResult');
+}
+
+function hideFileLoading() {
+    hideLoading('loadingContainer', 'fileUploadResult');
+}
+
+function showUrlLoading() {
+    showLoading('urlLoadingContainer', 'urlScanResult');
+}
+
+function hideUrlLoading() {
+    hideLoading('urlLoadingContainer', 'urlScanResult');
+}
+
+function showIpLoading() {
+    showLoading('ipLoadingContainer', 'ipScanResult');
+}
+
+function hideIpLoading() {
+    hideLoading('ipLoadingContainer', 'ipScanResult');
+}
+
+// Add these loading handler functions for reports
+function showReportIpLoading() {
+    showLoading('reportIpLoadingContainer', 'reportIpResult');
+}
+
+function hideReportIpLoading() {
+    hideLoading('reportIpLoadingContainer', 'reportIpResult');
+}
+
+function showReportUrlLoading() {
+    showLoading('reportUrlLoadingContainer', 'reportUrlResult');
+}
+
+function hideReportUrlLoading() {
+    hideLoading('reportUrlLoadingContainer', 'reportUrlResult');
+}
+
 // File upload
 document.addEventListener("DOMContentLoaded", () => {
     // Event listener for file upload
-    document.getElementById("uploadFileButton").addEventListener("click", uploadFile);
+    document.getElementById("uploadFileButton").addEventListener("click", () => {
+        uploadFile();
+    });
 
     // File upload function
     function uploadFile() {
-        const fileInput = document.getElementById('fileInput');
         const file = fileInput.files[0];
         const resultElement = document.getElementById('fileUploadResult');
 
         if (!file) {
             resultElement.textContent = "Please select a file to upload.";
-            return;
+            return Promise.reject("No file selected");
         }
+
+        showSpinner('uploadFileButton');
+        showFileLoading();
 
         const formData = new FormData();
         formData.append('file', file);
 
-        fetch(`${API_BASE_URL}/api`, {
+        return fetch(`${API_BASE_URL}/api`, {
             method: 'POST',
             body: formData
         })
@@ -30,23 +116,51 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(data => {
                 if (data.malicious === 'yes') {
                     fileMaliciousCount += 1;
+                    updateDashboard();
                 }
                 if (typeof data.result === 'string') {
-                    // Replace \n with <br> and **bold** with <strong>
                     resultElement.innerHTML = data.result
-                        .replace(/\n/g, '<br>')                    // Replace newlines with <br>
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 } else {
-                    // Format JSON data and replace formatting
                     resultElement.innerHTML = JSON.stringify(data, null, 2)
-                        .replace(/\n/g, '<br>')                    // Replace newlines with <br>
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Replace **text** with <strong>text</strong>
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 }
+                // Reset the form
+                fileInput.value = '';
+                fileName.textContent = '';
+                uploadButton.disabled = true;
             })
             .catch(error => {
                 resultElement.textContent = `Error: ${error}`;
                 console.error("Upload Error:", error);
+            })
+            .finally(() => {
+                hideSpinner('uploadFileButton');
+                hideFileLoading();
             });
+    }
+
+    // Add choose file button click handler
+    const chooseFileBtn = document.querySelector('.choose-file-btn');
+    if (chooseFileBtn) {
+        chooseFileBtn.addEventListener('click', () => {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) {
+                fileInput.click();
+            }
+        });
+    }
+
+    // File input change handler
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                updateFileName(e.target.files[0]);
+            }
+        });
     }
 });
 
@@ -58,56 +172,78 @@ document.addEventListener("DOMContentLoaded", () => {
             page.classList.remove('active');
         });
         document.getElementById(pageId).classList.add('active');
+        updateActiveNavButton(pageId);
     };
+
+    // URL/IP Scan toggle buttons
+    document.getElementById("toggleUrlScan").addEventListener("click", () => {
+        toggleScanSection('urlScanSection');
+    });
+
+    document.getElementById("toggleIpScan").addEventListener("click", () => {
+        toggleScanSection('ipScanSection');
+    });
+
+    // Report IP/URL toggle buttons
+    document.getElementById("toggleReportIp").addEventListener("click", () => {
+        toggleReportSection('reportIpSection');
+    });
+
+    document.getElementById("toggleReportUrl").addEventListener("click", () => {
+        toggleReportSection('reportUrlSection');
+    });
 
     // Navigation buttons
     document.getElementById("dashboardButton").addEventListener("click", () => showPage('dashboardPage'));
     document.getElementById("fileUploadButton").addEventListener("click", () => showPage('fileUploadPage'));
-    document.getElementById("urlIpScanButton").addEventListener("click", () => showPage('urlIpScanPage'));
-    document.getElementById("reportIpUrlButton").addEventListener("click", () => showPage('reportIpUrlPage'));
+    document.getElementById("urlIpScanButton").addEventListener("click", () => {
+        showPage('urlIpScanPage');
+        // Show default scan section
+        toggleScanSection('urlScanSection');
+    });
+    document.getElementById("reportIpUrlButton").addEventListener("click", () => {
+        showPage('reportIpUrlPage');
+        // Show default report section
+        toggleReportSection('reportIpSection');
+    });
     document.getElementById("QuizPageButton").addEventListener("click", () => showPage('QuizPage'));
-
-    // Toggle URL/IP Scanning sections
-    document.getElementById("toggleUrlScan").addEventListener("click", () => {
-        toggleSection('urlScanSection');
-    });
-
-    document.getElementById("toggleIpScan").addEventListener("click", () => {
-        toggleSection('ipScanSection');
-    });
-
-    // Toggle Report IP/URL sections
-    document.getElementById("toggleReportIp").addEventListener("click", () => {
-        toggleSection('reportIpSection');
-    });
-
-    document.getElementById("toggleReportUrl").addEventListener("click", () => {
-        toggleSection('reportUrlSection');
-    });
 
     // URL Scanning
     document.getElementById("scanUrlButton").addEventListener("click", () => {
         const url = document.getElementById("urlInput").value.trim();
         const urlScanResult = document.getElementById("urlScanResult");
 
-        if (url) {
-            fetch(`${API_BASE_URL}/api?url=${encodeURIComponent(url)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.malicious === 'yes') {
-                        urlMaliciousCount += 1;
-                    }
+        if (!url) {
+            urlScanResult.textContent = "Please enter a valid URL.";
+            return;
+        }
+
+        showSpinner('scanUrlButton');
+        showUrlLoading();
+
+        fetch(`${API_BASE_URL}/api?url=${encodeURIComponent(url)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.malicious === 'yes') {
+                    urlMaliciousCount += 1;
+                    updateDashboard();
+                }
+                setTimeout(() => {
                     urlScanResult.innerHTML = data.result
                         .replace(/\n/g, '<br>')
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                })
-                .catch(err => {
+                    hideSpinner('scanUrlButton');
+                    hideUrlLoading();
+                }, 500); // Add slight delay for smoother transition
+            })
+            .catch(err => {
+                setTimeout(() => {
                     urlScanResult.textContent = "Error scanning URL.";
                     console.error(err);
-                });
-        } else {
-            urlScanResult.textContent = "Please enter a valid URL.";
-        }
+                    hideSpinner('scanUrlButton');
+                    hideUrlLoading();
+                }, 500);
+            });
     });
 
     // IP Scanning
@@ -115,24 +251,37 @@ document.addEventListener("DOMContentLoaded", () => {
         const ip = document.getElementById("ipInput").value.trim();
         const ipScanResult = document.getElementById("ipScanResult");
 
-        if (ip) {
-            fetch(`${API_BASE_URL}/api?ip=${encodeURIComponent(ip)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.malicious === 'yes') {
-                        ipMaliciousCount += 1;
-                    }
+        if (!ip) {
+            ipScanResult.textContent = "Please enter a valid IP.";
+            return;
+        }
+
+        showSpinner('scanIpButton');
+        showIpLoading();
+
+        fetch(`${API_BASE_URL}/api?ip=${encodeURIComponent(ip)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.malicious === 'yes') {
+                    ipMaliciousCount += 1;
+                    updateDashboard();
+                }
+                setTimeout(() => {
                     ipScanResult.innerHTML = data.result
                         .replace(/\n/g, '<br>')
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                })
-                .catch(err => {
+                    hideSpinner('scanIpButton');
+                    hideIpLoading();
+                }, 500); // Add slight delay for smoother transition
+            })
+            .catch(err => {
+                setTimeout(() => {
                     ipScanResult.textContent = "Error scanning IP.";
                     console.error(err);
-                });
-        } else {
-            ipScanResult.textContent = "Please enter a valid IP.";
-        }
+                    hideSpinner('scanIpButton');
+                    hideIpLoading();
+                }, 500);
+            });
     });
 
     // Report IP
@@ -145,6 +294,9 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
     
+        showSpinner('reportIpButton');
+        showReportIpLoading();
+
         fetch(`${API_BASE_URL}/report-ip`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -152,10 +304,33 @@ document.addEventListener("DOMContentLoaded", () => {
         })
             .then(response => response.json())
             .then(data => {
-                resultElement.textContent = JSON.stringify(data, null, 2).replace(/^"(.*)"$/, '$1');
+                // Format the response to remove JSON structure
+                let message = '';
+                if (typeof data === 'object') {
+                    if (data.error) {
+                        message = data.error;
+                    } else if (data.message) {
+                        message = data.message;
+                    } else {
+                        message = Object.values(data).join('\n');
+                    }
+                } else {
+                    message = data.toString();
+                }
+                
+                // Format the message with proper line breaks and styling
+                resultElement.innerHTML = message
+                    .replace(/\n/g, '<br>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             })
             .catch(error => {
-                resultElement.textContent = `Error: ${error}`;
+                resultElement.textContent = `Error: ${error.message || 'Failed to report IP'}`;
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    hideSpinner('reportIpButton');
+                    hideReportIpLoading();
+                }, 500);
             });
     });
 
@@ -164,40 +339,98 @@ document.addEventListener("DOMContentLoaded", () => {
         const url = document.getElementById("reportUrlInput").value.trim();
         const reportUrlResult = document.getElementById("reportUrlResult");
 
-        if (url) {
-            fetch(`${API_BASE_URL}/report-url`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    reportUrlResult.innerHTML = data
-                        .replace(/\n/g, '<br>')
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                })
-                .catch(err => {
-                    reportUrlResult.textContent = "Error reporting URL.";
-                    console.error(err);
-                });
-        } else {
+        if (!url) {
             reportUrlResult.textContent = "Please enter a valid URL.";
+            return;
         }
+
+        showSpinner('reportUrlButton');
+        showReportUrlLoading();
+
+        fetch(`${API_BASE_URL}/report-url`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Format the response to remove JSON structure
+                let message = '';
+                if (typeof data === 'object') {
+                    if (data.error) {
+                        message = data.error;
+                    } else if (data.message) {
+                        message = data.message;
+                    } else {
+                        message = Object.values(data).join('\n');
+                    }
+                } else {
+                    message = data.toString();
+                }
+                
+                // Format the message with proper line breaks and styling
+                reportUrlResult.innerHTML = message
+                    .replace(/\n/g, '<br>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            })
+            .catch(err => {
+                reportUrlResult.textContent = "Error reporting URL.";
+                console.error(err);
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    hideSpinner('reportUrlButton');
+                    hideReportUrlLoading();
+                }, 500);
+            });
     });
 
-    // Dashboard refresh
-    document.getElementById("refreshDashboard").addEventListener("click", fetchDashboardData);
+    // Clear button event listeners
+    document.getElementById("clearFileResult").addEventListener("click", clearFileUpload);
+    document.getElementById("clearUrlResult").addEventListener("click", clearUrlScan);
+    document.getElementById("clearIpResult").addEventListener("click", clearIpScan);
+    document.getElementById("clearReportIpResult").addEventListener("click", clearReportIp);
+    document.getElementById("clearReportUrlResult").addEventListener("click", clearReportUrl);
 });
 
-// Function to toggle between sections
-function toggleSection(sectionId) {
-    document.querySelectorAll('.scan-section, .report-section').forEach(section => {
+// Update the toggle functions to be more specific
+function toggleScanSection(sectionId) {
+    // Hide all scan sections
+    document.querySelectorAll('.scan-section').forEach(section => {
         section.style.display = 'none';
     });
+    // Show the selected section
     document.getElementById(sectionId).style.display = 'block';
+    
+    // Update nav button active states
+    document.querySelectorAll('.scan-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (sectionId === 'urlScanSection') {
+        document.getElementById('toggleUrlScan').classList.add('active');
+    } else {
+        document.getElementById('toggleIpScan').classList.add('active');
+    }
 }
 
-
+function toggleReportSection(sectionId) {
+    // Hide all report sections
+    document.querySelectorAll('.report-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    // Show the selected section
+    document.getElementById(sectionId).style.display = 'block';
+    
+    // Update nav button active states
+    document.querySelectorAll('.scan-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (sectionId === 'reportIpSection') {
+        document.getElementById('toggleReportIp').classList.add('active');
+    } else {
+        document.getElementById('toggleReportUrl').classList.add('active');
+    }
+}
 
 //Quiz Page
 const questions = [
@@ -222,15 +455,15 @@ const playAgainBtn = document.getElementById("playAgain");
 let nextButtonVisible = false;
 
 function loadQuestion() {
-    quizContent.innerHTML = ""; // Clear the previous content
-    nextButtonVisible = false; // Reset next button visibility
+    quizContent.innerHTML = "";
+    nextButtonVisible = false;
 
     const currentQuestion = questions[currentQuestionIndex];
 
     // Create question text
     const questionDiv = document.createElement("div");
     questionDiv.classList.add("question");
-    questionDiv.innerHTML = `<p>${currentQuestionIndex + 1}. ${currentQuestion.question}</p>`;
+    questionDiv.innerHTML = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
     quizContent.appendChild(questionDiv);
 
     // Create options
@@ -246,54 +479,60 @@ function loadQuestion() {
 
     quizContent.appendChild(optionsDiv);
 
-    // Create space for feedback
+    // Create feedback div
     const feedbackDiv = document.createElement("div");
     feedbackDiv.id = "feedback";
-    feedbackDiv.style.marginTop = "15px";
     quizContent.appendChild(feedbackDiv);
 
-    // Create "Next" button (hidden initially)
+    // Create next button
     const nextButton = document.createElement("button");
     nextButton.id = "nextButton";
-    nextButton.textContent = "Next";
-    nextButton.style.display = "none"; // Initially hidden
-    nextButton.style.backgroundColor = "#28a745";
-    nextButton.style.color = "white";
-    nextButton.style.padding = "10px 20px";
-    nextButton.style.marginTop = "20px";
-    nextButton.style.cursor = "pointer";
-    nextButton.style.border = "none";
-    nextButton.style.fontSize = "16px";
-    nextButton.style.borderRadius = "5px";
-    nextButton.style.float = "right";
-
+    nextButton.className = "next-button";
+    nextButton.style.display = "none";
+    nextButton.innerHTML = `
+        Next Question
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+    `;
     nextButton.onclick = () => moveToNextQuestion();
     quizContent.appendChild(nextButton);
 }
 
 function checkAnswer(button, selected, correct) {
     const optionsButtons = document.querySelectorAll(".options button");
-
-    // Disable all buttons after an answer is selected
     optionsButtons.forEach(btn => btn.disabled = true);
 
-    // Provide feedback
     const feedbackDiv = document.getElementById("feedback");
+    
     if (selected === correct) {
-        button.style.backgroundColor = "lightgreen";
-        feedbackDiv.innerHTML = `<p style="color:green; font-weight:bold;">Correct! ✅ The answer is: ${correct}</p>`;
+        button.classList.add("correct");
+        feedbackDiv.className = "feedback correct";
+        feedbackDiv.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            Correct! The answer is: ${correct}
+        `;
         score++;
     } else {
-        button.style.backgroundColor = "lightcoral";
-        feedbackDiv.innerHTML = `<p style="color:red; font-weight:bold;">Wrong! ❌ The correct answer is: ${correct}</p>`;
+        button.classList.add("wrong");
+        feedbackDiv.className = "feedback wrong";
+        feedbackDiv.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            Wrong! The correct answer is: ${correct}
+        `;
     }
 
     updateScore();
-
-    // Show the "Next" button
     const nextButton = document.getElementById("nextButton");
-    nextButton.style.marginTop = "30px";
-    nextButton.style.display = "inline-block";
+    nextButton.style.display = "inline-flex";
     nextButtonVisible = true;
 }
 
@@ -313,8 +552,18 @@ function updateScore() {
 }
 
 function endQuiz() {
-    quizContent.innerHTML = `<h2>Your Final Score: ${score} / 10</h2>`;
-    playAgainBtn.style.display = "block";
+    quizContent.innerHTML = `
+        <div class="quiz-result">
+            <h2>Quiz Completed! 🎉</h2>
+            <p class="final-score">Your Final Score: ${score} / 10</p>
+            <div class="score-message">
+                ${score >= 8 ? "Excellent work! You're a cybersecurity expert! 🏆" :
+                  score >= 6 ? "Good job! Keep learning to improve! 📚" :
+                  "Keep practicing to improve your knowledge! 💪"}
+            </div>
+        </div>
+    `;
+    playAgainBtn.style.display = "flex";
 }
 
 function playAgain() {
@@ -338,4 +587,124 @@ function fetchDashboardData() {
     ipCountElement.textContent = ipMaliciousCount;
     fileCountElement.textContent = fileMaliciousCount;
     urlCountElement.textContent = urlMaliciousCount;
+}
+
+// Add this to your existing DOMContentLoaded event listener
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const fileName = document.getElementById('fileName');
+const uploadButton = document.getElementById('uploadFileButton');
+
+// Drag and drop handlers
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+});
+
+dropZone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        fileInput.files = files;
+        updateFileName(files[0]);
+    }
+});
+
+// File input change handler
+fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        updateFileName(e.target.files[0]);
+    }
+});
+
+function updateFileName(file) {
+    fileName.textContent = file.name;
+    uploadButton.disabled = false;
+}
+
+// Add this function to automatically update dashboard
+function updateDashboard() {
+    const fileCountElement = document.getElementById('fileCount');
+    const urlCountElement = document.getElementById('urlCount');
+    const ipCountElement = document.getElementById('ipCount');
+
+    if (fileCountElement) fileCountElement.textContent = fileMaliciousCount;
+    if (urlCountElement) urlCountElement.textContent = urlMaliciousCount;
+    if (ipCountElement) ipCountElement.textContent = ipMaliciousCount;
+}
+
+// Add these clear functions
+function clearFileUpload() {
+    const fileInput = document.getElementById('fileInput');
+    const fileName = document.getElementById('fileName');
+    const resultElement = document.getElementById('fileUploadResult');
+    const uploadButton = document.getElementById('uploadFileButton');
+    
+    fileInput.value = '';
+    fileName.textContent = '';
+    resultElement.textContent = '';
+    uploadButton.disabled = true;
+}
+
+function clearUrlScan() {
+    const urlInput = document.getElementById('urlInput');
+    const resultElement = document.getElementById('urlScanResult');
+    
+    urlInput.value = '';
+    resultElement.textContent = '';
+}
+
+function clearIpScan() {
+    const ipInput = document.getElementById('ipInput');
+    const resultElement = document.getElementById('ipScanResult');
+    
+    ipInput.value = '';
+    resultElement.textContent = '';
+}
+
+function clearReportIp() {
+    const ipInput = document.getElementById('reportIpInput');
+    const resultElement = document.getElementById('reportIpResult');
+    
+    ipInput.value = '';
+    resultElement.textContent = '';
+}
+
+function clearReportUrl() {
+    const urlInput = document.getElementById('reportUrlInput');
+    const resultElement = document.getElementById('reportUrlResult');
+    
+    urlInput.value = '';
+    resultElement.textContent = '';
+}
+
+// Add this function to handle active state of navigation buttons
+function updateActiveNavButton(pageId) {
+    document.querySelectorAll('.main-nav button').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    switch(pageId) {
+        case 'dashboardPage':
+            document.getElementById('dashboardButton').classList.add('active');
+            break;
+        case 'fileUploadPage':
+            document.getElementById('fileUploadButton').classList.add('active');
+            break;
+        case 'urlIpScanPage':
+            document.getElementById('urlIpScanButton').classList.add('active');
+            break;
+        case 'reportIpUrlPage':
+            document.getElementById('reportIpUrlButton').classList.add('active');
+            break;
+        case 'QuizPage':
+            document.getElementById('QuizPageButton').classList.add('active');
+            break;
+    }
 }

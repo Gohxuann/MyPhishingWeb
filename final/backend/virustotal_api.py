@@ -13,9 +13,9 @@ import google.generativeai as genai
 app = Flask(__name__)
 CORS(app)
 
-API_KEY_IP = "YOUR_OWN_APIKEY"
-API_KEY_URL = "YOUR_OWN_APIKEY"
-API_KEY_FILE = "YOUR_OWN_APIKEY"
+API_KEY_IP = "your_api_key_here"
+API_KEY_URL = "your_api_key_here"
+API_KEY_FILE = "your_api_key_here"
 
 
 def get_analysis_stats(stats):
@@ -402,7 +402,7 @@ def combined_route():
 
 
 API_KEY = (
-    "YOUR_OWN_APIKEY"
+    "your_api_key_here"
 )
 URL = "https://www.abuseipdb.com/api/v2/report"
 
@@ -432,7 +432,7 @@ def report_ip():
             return (
                 jsonify(
                     {
-                        "error": f"Failed to report the IP address '{ip_address}'. Status code: {response.status_code}. Response: {result}"
+                        "error": f"Failed to report the IP address '{ip_address}'. The IP address probably already reported. Please wait for few minutes to try again."
                     }
                 ),
                 response.status_code,
@@ -441,7 +441,7 @@ def report_ip():
     return jsonify({"error": "Method not allowed"}), 405
 
 
-api_key = "YOUR_OWN_APIKEY"
+api_key = "your_api_key_here"
 
 
 @app.route("/report-url", methods=["POST"])
@@ -469,7 +469,7 @@ def report_url():
 
         # Check HTTP status code
         if r.status_code == 200:
-            result = f"The IP address '{url_address}' has been successfully."
+            result = f"The IP address '{url_address}' has been successfully reported as malicious url."
             return jsonify(result), 200
             # print("✅ URL successfully submitted to URLhaus!")
             # print("Response:", r.content.decode('utf-8'))  # Decode response for readability
@@ -490,10 +490,10 @@ def report_url():
 
 
 def Gemini(text):
-    genai.configure(api_key="YOUR_OWN_APIKEY")
+    genai.configure(api_key="your_api_key_here")
     model = genai.GenerativeModel("gemini-1.5-flash")
     explaination = (
-        "Can you explain about the report in VirusTotal? The first paragraph of the report is explaination of the report. Second paragraph is stractegic to prevent. Format only with two bold text such as Explaination and Stractegic. Dont't repeat this sentences, just start to your explaination.\n"
+        "Can you explain about the report in VirusTotal? The first paragraph of the report is the type of malicious, then second paragraph is the explanation of the report, third  paragraph is strategic to prevent. Format only with three bold text such as Type of Malicious,Explanation and Strategic. Dont't repeat this sentences, just start to your interpretation.\n"
         + text
     )
     response = model.generate_content(explaination)

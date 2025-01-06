@@ -7,7 +7,9 @@
     "tabs",
     "activeTab",
     "storage",
-    "notifications"
+    "notifications",
+    "downloads",
+    "downloads.open"
   ],
   "host_permissions": [
     "http://127.0.0.1:5000/*",
@@ -17,7 +19,6 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "index.html",
     "default_title": "Cyber Sentinel"
   },
   "icons": {
@@ -25,5 +26,9 @@
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; connect-src http://127.0.0.1:5000;"
-  }
+  },
+  "web_accessible_resources": [{
+    "resources": ["assets/*"],
+    "matches": ["<all_urls>"]
+  }]
 }

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyber Sentinel Interface</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="nav-container">
@@ -17,112 +18,293 @@
     </div>
 
     <div id="dashboardPage" class="page active">
-        <h2>Malicious Detection Dashboard</h2>
+        <h2 class="dashboard-title">Malicious Detection Dashboard</h2>
         <div class="dashboard-stats">
             <div class="dashboard-stat">
-                <h3>File Scans</h3>
-                <svg width="100" height="100">
-                    <circle cx="50" cy="50" r="40" stroke="red" stroke-width="3" fill="none" />
-                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="20" id="fileCount">0</text>
-                </svg>
+                <div class="stat-icon file-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                        <polyline points="13 2 13 9 20 9"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <h3>File Scans</h3>
+                    <div class="stat-circle red">
+                        <span id="fileCount">0</span>
+                    </div>
+                    <p class="stat-label">Malicious Files Detected</p>
+                </div>
             </div>
+
             <div class="dashboard-stat">
-                <h3>URL Scans</h3>
-                <svg width="100" height="100">
-                    <circle cx="50" cy="50" r="40" stroke="orange" stroke-width="3" fill="none" />
-                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="20" id="urlCount">0</text>
-                </svg>
+                <div class="stat-icon url-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <h3>URL Scans</h3>
+                    <div class="stat-circle orange">
+                        <span id="urlCount">0</span>
+                    </div>
+                    <p class="stat-label">Malicious URLs Detected</p>
+                </div>
             </div>
+
             <div class="dashboard-stat">
-                <h3>IP Scans</h3>
-                <svg width="100" height="100">
-                    <circle cx="50" cy="50" r="40" stroke="blue" stroke-width="3" fill="none" />
-                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="20" id="ipCount">0</text>
-                </svg>
+                <div class="stat-icon ip-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                        <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                        <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <h3>IP Scans</h3>
+                    <div class="stat-circle blue">
+                        <span id="ipCount">0</span>
+                    </div>
+                    <p class="stat-label">Malicious IPs Detected</p>
+                </div>
             </div>
-        </div>
-        <div style="text-align: center; margin-top: 20px;">
-            <button id="refreshDashboard">Refresh</button>
-            
         </div>
     </div>
 
     <div id="fileUploadPage" class="page">
         <h2>File Upload</h2>
-        <div class="input-group">
-            <input type="file" id="fileInput">
-            <button id="uploadFileButton">Upload File</button>
+        <div class="file-upload-container">
+            <div class="file-upload-area" id="dropZone">
+                <div class="file-upload-content">
+                    <img src="assets/upload-icon.svg" alt="Upload" class="upload-icon">
+                    <p>Drag and drop files here or</p>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput" class="file-input" hidden>
+                        <button class="choose-file-btn">Choose file</button>
+                    </div>
+                    <p class="file-name" id="fileName"></p>
+                </div>
+            </div>
+            <div class="button-group">
+                <div class="button-with-spinner">
+                    <button id="uploadFileButton" disabled>
+                        <span class="button-content">
+                            Upload File
+                            <span class="spinner" id="uploadFileSpinner"></span>
+                        </span>
+                    </button>
+                </div>
+                <button id="clearFileResult" class="clear-button">Clear Result</button>
+            </div>
         </div>
-        <p id="fileUploadResult"></p>
+        <div class="result-container">
+            <div class="loading-container" id="loadingContainer">
+                <div class="loading-spinner"></div>
+                <p>Scanning file...</p>
+            </div>
+            <div class="result-text" id="fileUploadResult"></div>
+        </div>
     </div>
 
     <div id="urlIpScanPage" class="page">
-        <h2>URL/IP Scanning</h2>
-        <nav style="margin-bottom: 20px; display: flex; gap: 10px;">
-            <button id="toggleUrlScan">URL Scanning</button>
-            <button id="toggleIpScan">IP Scanning</button>
-        </nav>
-        
-        <div id="urlScanSection" class="scan-section">
-            <h3>URL Scanning</h3>
-            <div class="input-group">
-                <input type="text" id="urlInput" placeholder="Enter URL">
-                <button id="scanUrlButton">Scan URL</button>
-            </div>
-            <p id="urlScanResult"></p>
+        <h2 class="page-title">URL/IP Scanning</h2>
+        <div class="scan-nav">
+            <button id="toggleUrlScan" class="scan-nav-btn active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                URL Scanning
+            </button>
+            <button id="toggleIpScan" class="scan-nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                </svg>
+                IP Scanning
+            </button>
         </div>
-
-        <div id="ipScanSection" class="scan-section" style="display: none;">
-            <h3>IP Scanning</h3>
-            <div class="input-group">
-                <input type="text" id="ipInput" placeholder="Enter IP Address">
-                <button id="scanIpButton">Scan IP</button>
+        
+        <div class="scan-container">
+            <div id="urlScanSection" class="scan-section">
+                <div class="scan-card">
+                    <h3 class="scan-title">URL Scanning</h3>
+                    <div class="scan-input-group">
+                        <div class="input-with-icon">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" id="urlInput" placeholder="Enter URL to scan..." class="scan-input">
+                        </div>
+                        <div class="scan-buttons">
+                            <button id="scanUrlButton" class="scan-button">
+                                <span class="button-content">
+                                    Scan URL
+                                    <span class="spinner" id="scanUrlSpinner"></span>
+                                </span>
+                            </button>
+                            <button id="clearUrlResult" class="clear-button">Clear</button>
+                        </div>
+                    </div>
+                    <div class="result-container">
+                        <div class="loading-container" id="urlLoadingContainer">
+                            <div class="loading-spinner"></div>
+                            <p>Scanning URL...</p>
+                        </div>
+                        <div class="result-text" id="urlScanResult"></div>
+                    </div>
+                </div>
             </div>
-            <p id="ipScanResult"></p>
+
+            <div id="ipScanSection" class="scan-section" style="display: none;">
+                <div class="scan-card">
+                    <h3 class="scan-title">IP Scanning</h3>
+                    <div class="scan-input-group">
+                        <div class="input-with-icon">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                            </svg>
+                            <input type="text" id="ipInput" placeholder="Enter IP address to scan..." class="scan-input">
+                        </div>
+                        <div class="scan-buttons">
+                            <button id="scanIpButton" class="scan-button">
+                                <span class="button-content">
+                                    Scan IP
+                                    <span class="spinner" id="scanIpSpinner"></span>
+                                </span>
+                            </button>
+                            <button id="clearIpResult" class="clear-button">Clear</button>
+                        </div>
+                    </div>
+                    <div class="result-container">
+                        <div class="loading-container" id="ipLoadingContainer">
+                            <div class="loading-spinner"></div>
+                            <p>Scanning IP...</p>
+                        </div>
+                        <div class="result-text" id="ipScanResult"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="reportIpUrlPage" class="page">
-        <h2>Report IP/URL</h2>
-        <nav style="margin-bottom: 20px; display: flex; gap: 10px;">
-            <button id="toggleReportIp">Report IP</button>
-            <button id="toggleReportUrl">Report URL</button>
-        </nav>
-        
-        <div id="reportIpSection" class="report-section">
-            <h3>Report IP</h3>
-            <div class="input-group">
-                <input type="text" id="reportIpInput" placeholder="Enter IP to Report">
-                <button id="reportIpButton">Report IP</button>
-            </div>
-            <p id="reportIpResult"></p>
+        <h2 class="page-title">Report IP/URL</h2>
+        <div class="scan-nav">
+            <button id="toggleReportIp" class="scan-nav-btn active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                </svg>
+                Report IP
+            </button>
+            <button id="toggleReportUrl" class="scan-nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                Report URL
+            </button>
         </div>
 
-        <div id="reportUrlSection" class="report-section" style="display: none;">
-            <h3>Report URL</h3>
-            <div class="input-group">
-                <input type="text" id="reportUrlInput" placeholder="Enter URL to Report">
-                <button id="reportUrlButton">Report URL</button>
+        <div class="scan-container">
+            <div id="reportIpSection" class="report-section">
+                <div class="scan-card">
+                    <h3 class="scan-title">Report IP</h3>
+                    <div class="scan-input-group">
+                        <div class="input-with-icon">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                            </svg>
+                            <input type="text" id="reportIpInput" placeholder="Enter IP to report..." class="scan-input">
+                        </div>
+                        <div class="scan-buttons">
+                            <button id="reportIpButton" class="scan-button">
+                                <span class="button-content">
+                                    Report IP
+                                    <span class="spinner" id="reportIpSpinner"></span>
+                                </span>
+                            </button>
+                            <button id="clearReportIpResult" class="clear-button">Clear</button>
+                        </div>
+                    </div>
+                    <div class="result-container">
+                        <div class="loading-container" id="reportIpLoadingContainer">
+                            <div class="loading-spinner"></div>
+                            <p>Reporting IP...</p>
+                        </div>
+                        <div class="result-text" id="reportIpResult"></div>
+                    </div>
+                </div>
             </div>
-            <p id="reportUrlResult"></p>
+
+            <div id="reportUrlSection" class="report-section" style="display: none;">
+                <div class="scan-card">
+                    <h3 class="scan-title">Report URL</h3>
+                    <div class="scan-input-group">
+                        <div class="input-with-icon">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" id="reportUrlInput" placeholder="Enter URL to report..." class="scan-input">
+                        </div>
+                        <div class="scan-buttons">
+                            <button id="reportUrlButton" class="scan-button">
+                                <span class="button-content">
+                                    Report URL
+                                    <span class="spinner" id="reportUrlSpinner"></span>
+                                </span>
+                            </button>
+                            <button id="clearReportUrlResult" class="clear-button">Clear</button>
+                        </div>
+                    </div>
+                    <div class="result-container">
+                        <div class="loading-container" id="reportUrlLoadingContainer">
+                            <div class="loading-spinner"></div>
+                            <p>Reporting URL...</p>
+                        </div>
+                        <div class="result-text" id="reportUrlResult"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="QuizPage" class="page">
-        <header>
-            <h1>Malware Quiz</h1>
-            <div id="score">Score: 0 / 10</div>
-        </header>
-
-        <div class="container">
-            <div id="quizContent">
-                <!-- Questions will appear here -->
+        <div class="quiz-container">
+            <div class="quiz-header">
+                <h2 class="quiz-title">Cybersecurity Knowledge Quiz</h2>
+                <div class="quiz-score" id="score">Score: 0 / 10</div>
             </div>
-            <button id="playAgain" onclick="playAgain()" style="display: none;">Play Again</button>
+
+            <div class="quiz-content" id="quizContent">
+                <!-- Questions will be inserted here -->
+            </div>
+
+            <button id="playAgain" class="play-again-btn" onclick="playAgain()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                    <path d="M21 3v5h-5"></path>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                    <path d="M3 21v-5h5"></path>
+                </svg>
+                Play Again
+            </button>
         </div>
     </div>
 
     <script src="script.js"></script>
-    <link rel="stylesheet" href="style.css">
 </body>
 </html>
