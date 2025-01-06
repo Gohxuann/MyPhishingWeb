@@ -432,20 +432,137 @@ function toggleReportSection(sectionId) {
     }
 }
 
-//Quiz Page
-const questions = [
-    { question: "What is phishing?", options: ["A type of virus", "A method to steal sensitive data using fake emails", "An antivirus tool", "A network protocol"], answer: "A method to steal sensitive data using fake emails" },
-    { question: "What does ransomware do?", options: ["Steals personal data", "Locks or encrypts files until a ransom is paid", "Monitors keystrokes", "Repairs systems"], answer: "Locks or encrypts files until a ransom is paid" },
-    { question: "What is a trojan horse in cybersecurity?", options: ["An email virus", "A type of malware disguised as legitimate software", "A firewall", "A DDoS attack"], answer: "A type of malware disguised as legitimate software" },
-    { question: "What is the primary goal of spyware?", options: ["Encrypt files", "Steal personal or sensitive information", "Block internet access", "Destroy hardware"], answer: "Steal personal or sensitive information" },
-    { question: "Which malware spreads automatically across networks?", options: ["Spyware", "Worm", "Trojan", "Ransomware"], answer: "Worm" },
-    { question: "What is a DDoS attack?", options: ["An email-based malware", "An attack that floods servers to cause disruption", "A virus that steals bank data", "Encryption software"], answer: "An attack that floods servers to cause disruption" },
-    { question: "How can you protect against phishing attacks?", options: ["Use firewalls", "Avoid clicking suspicious links in emails", "Use an antivirus program", "Turn off your computer"], answer: "Avoid clicking suspicious links in emails" },
-    { question: "What type of malware records your keystrokes?", options: ["Spyware", "Adware", "Keylogger", "Worm"], answer: "Keylogger" },
-    { question: "What is a common sign of ransomware?", options: ["Blue screen of death", "A message demanding payment to unlock files", "Slow computer performance", "Increased pop-up ads"], answer: "A message demanding payment to unlock files" },
-    { question: "What does adware typically do?", options: ["Displays unwanted advertisements", "Deletes files", "Steals passwords", "Encrypts documents"], answer: "Displays unwanted advertisements" },
+// Update the questions array with 20 questions
+const questionBank = [
+    {
+        question: "What is phishing?",
+        options: ["A method to steal sensitive data using fake emails", "A type of virus", "An antivirus tool", "A network protocol"],
+        answer: "A method to steal sensitive data using fake emails"
+    },
+    {
+        question: "What does ransomware do?",
+        options: ["Locks or encrypts files until a ransom is paid", "Steals personal data", "Monitors keystrokes", "Repairs systems"],
+        answer: "Locks or encrypts files until a ransom is paid"
+    },
+    {
+        question: "What is a firewall?",
+        options: ["A security system that monitors network traffic", "A type of computer virus", "A backup system", "A password manager"],
+        answer: "A security system that monitors network traffic"
+    },
+    {
+        question: "What is two-factor authentication (2FA)?",
+        options: ["An additional security layer beyond passwords", "A type of encryption", "A backup method", "A virus scanning technique"],
+        answer: "An additional security layer beyond passwords"
+    },
+    {
+        question: "What is malware?",
+        options: ["Malicious software designed to harm systems", "A security tool", "A type of firewall", "An authentication method"],
+        answer: "Malicious software designed to harm systems"
+    },
+    {
+        question: "What is a VPN used for?",
+        options: ["Encrypting internet traffic and hiding IP", "Storing passwords", "Scanning for viruses", "Creating backups"],
+        answer: "Encrypting internet traffic and hiding IP"
+    },
+    {
+        question: "What is social engineering?",
+        options: ["Manipulating people to reveal information", "Writing code", "Installing software", "Network configuration"],
+        answer: "Manipulating people to reveal information"
+    },
+    {
+        question: "What is encryption?",
+        options: ["Converting data into a secret code", "Deleting files", "Backing up data", "Scanning for viruses"],
+        answer: "Converting data into a secret code"
+    },
+    {
+        question: "What is a data breach?",
+        options: ["Unauthorized access to sensitive data", "A system backup", "A software update", "A network protocol"],
+        answer: "Unauthorized access to sensitive data"
+    },
+    {
+        question: "What is a strong password?",
+        options: ["Complex combination of characters", "A simple word", "Your birth date", "Your name"],
+        answer: "Complex combination of characters"
+    },
+    {
+        question: "What is cyberstalking?",
+        options: ["Online harassment and monitoring", "A security feature", "A backup method", "A type of firewall"],
+        answer: "Online harassment and monitoring"
+    },
+    {
+        question: "What is a zero-day exploit?",
+        options: ["An unknown software vulnerability", "A backup system", "A password type", "A network protocol"],
+        answer: "An unknown software vulnerability"
+    },
+    {
+        question: "What is DNS poisoning?",
+        options: ["Redirecting traffic to malicious sites", "A virus type", "A backup method", "A password system"],
+        answer: "Redirecting traffic to malicious sites"
+    },
+    {
+        question: "What is a botnet?",
+        options: ["Network of infected computers", "A security tool", "A backup system", "A password manager"],
+        answer: "Network of infected computers"
+    },
+    {
+        question: "What is cryptojacking?",
+        options: ["Unauthorized crypto mining", "A backup method", "A password type", "A security protocol"],
+        answer: "Unauthorized crypto mining"
+    },
+    {
+        question: "What is a man-in-the-middle attack?",
+        options: ["Intercepting communications", "A backup system", "A virus type", "A password method"],
+        answer: "Intercepting communications"
+    },
+    {
+        question: "What is a brute force attack?",
+        options: ["Trying all possible passwords", "A security feature", "A backup method", "A network protocol"],
+        answer: "Trying all possible passwords"
+    },
+    {
+        question: "What is SQL injection?",
+        options: ["Database code insertion attack", "A virus type", "A backup system", "A password method"],
+        answer: "Database code insertion attack"
+    },
+    {
+        question: "What is a honeypot?",
+        options: ["A security trap for attackers", "A virus type", "A backup method", "A password system"],
+        answer: "A security trap for attackers"
+    },
+    {
+        question: "What is digital forensics?",
+        options: ["Investigating digital evidence", "A virus type", "A backup system", "A security protocol"],
+        answer: "Investigating digital evidence"
+    }
 ];
 
+// Function to shuffle array
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Function to shuffle options for a question
+function shuffleOptions(question) {
+    const shuffledOptions = shuffleArray([...question.options]);
+    return {
+        ...question,
+        options: shuffledOptions,
+        answer: question.answer
+    };
+}
+
+// Function to get random questions
+function getRandomQuestions(count) {
+    const shuffledQuestions = shuffleArray([...questionBank]);
+    return shuffledQuestions.slice(0, count).map(q => shuffleOptions(q));
+}
+
+// Update your existing quiz variables
+let questions = [];
 let currentQuestionIndex = 0;
 let score = 0;
 
@@ -455,6 +572,11 @@ const playAgainBtn = document.getElementById("playAgain");
 let nextButtonVisible = false;
 
 function loadQuestion() {
+    if (currentQuestionIndex === 0) {
+        // Only get new random questions when starting a new quiz
+        questions = getRandomQuestions(10);
+    }
+
     quizContent.innerHTML = "";
     nextButtonVisible = false;
 
