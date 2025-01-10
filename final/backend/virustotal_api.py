@@ -9,13 +9,14 @@ from time import sleep
 from pathlib import Path
 from flask_cors import CORS
 import google.generativeai as genai
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-API_KEY_IP = "your_api_key_here"
-API_KEY_URL = "your_api_key_here"
-API_KEY_FILE = "your_api_key_here"
+API_KEY_IP = "7f7fe9f967c41cc8c382dc4f7b7b4f33c1940e84ea205570f7adde9f5e6931a9"
+API_KEY_URL = "25908485d1d7ca338d0e1427d00801a2180bc0090d165a60df8ce2703b88a697"
+API_KEY_FILE = "b221c495a4e5654c82fbc7928804bf665d0b04d1ece9818e453c92fe8f5664a6"
 
 
 def get_analysis_stats(stats):
@@ -402,7 +403,7 @@ def combined_route():
 
 
 API_KEY = (
-    "your_api_key_here"
+    "540b085d3aeaaf314c12ae782b31c5b5ae1740db7466c5406bf33b2ab051a63276b540624d9b534e"
 )
 URL = "https://www.abuseipdb.com/api/v2/report"
 
@@ -441,7 +442,7 @@ def report_ip():
     return jsonify({"error": "Method not allowed"}), 405
 
 
-api_key = "your_api_key_here"
+api_key = "044059af024c688ff5839ad7579e738191a7712b48ae0ec3"
 
 
 @app.route("/report-url", methods=["POST"])
@@ -490,14 +491,119 @@ def report_url():
 
 
 def Gemini(text):
-    genai.configure(api_key="your_api_key_here")
+    # Original function for VirusTotal reports
+    genai.configure(api_key="AIzaSyBN1pSOJuW0t4Bi65RE736KMrc14dTJAf4")
     model = genai.GenerativeModel("gemini-1.5-flash")
-    explaination = (
+    explanation = (
         "Can you explain about the report in VirusTotal? The first paragraph of the report is the type of malicious, then second paragraph is the explanation of the report, third  paragraph is strategic to prevent. Format only with three bold text such as Type of Malicious,Explanation and Strategic. Dont't repeat this sentences, just start to your interpretation.\n"
         + text
     )
-    response = model.generate_content(explaination)
+    response = model.generate_content(explanation)
     return response.text
+
+def analyze_extracted_text(text):
+    try:
+        genai.configure(api_key="AIzaSyBN1pSOJuW0t4Bi65RE736KMrc14dTJAf4")
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        analysis_prompt = f"""
+        Analyze this text for potential phishing or spam content:
+        "{text}"
+
+        Please provide:
+        1. Classification (Is it phishing/spam/legitimate?)
+        2. Identified suspicious elements (if any)
+        3. Risk level (High/Medium/Low)
+        4. Explanation of why it might be dangerous or safe
+
+        Format the response with these headers in bold:
+        Classification:
+        Suspicious Elements:
+        Risk Level:
+        Explanation:
+        Make sure the above header are bold.
+        """
+        
+        response = model.generate_content(analysis_prompt)
+        if response and response.text:
+            return response.text
+        return "Analysis not available"
+        
+    except Exception as e:
+        print(f"Analysis Error: {str(e)}")
+        return "Error performing analysis"
+
+@app.route("/extract-image", methods=["POST"])
+def extract_text():
+    if "image" not in request.files:
+        return jsonify({"error": "No image file provided"}), 400
+
+    image_file = request.files["image"]
+    
+    if not image_file.filename:
+        return jsonify({"error": "No selected file"}), 400
+        
+    try:
+        image_path = os.path.join("/tmp", image_file.filename)
+        image_file.save(image_path)
+
+        try:
+            result = ocr_space_file(image_path)
+            
+            if os.path.exists(image_path):
+                os.remove(image_path)
+            
+            if isinstance(result, str):
+                result = json.loads(result)
+            
+            if result.get("ParsedResults"):
+                extracted_text = result["ParsedResults"][0].get("ParsedText", "").strip()
+                if extracted_text:
+                    # Get both the extracted text and its analysis
+                    analysis = analyze_extracted_text(extracted_text)
+                    print(analysis)
+                    response_data = {
+                        "analysis": analysis,
+                        "success": True
+                    }
+                    return jsonify(response_data)
+            
+            return jsonify({
+                "error": "No text was detected in the image",
+                "success": False
+            })
+            
+        except Exception as e:
+            print(f"OCR Error: {str(e)}")
+            return jsonify({
+                "error": "Failed to process image",
+                "success": False
+            }), 500
+            
+    except Exception as e:
+        print(f"Server Error: {str(e)}")
+        return jsonify({
+            "error": str(e),
+            "success": False
+        }), 500
+
+def ocr_space_file(filename, overlay=False, api_key='K84515326088957', language='eng'):
+    payload = {
+        'isOverlayRequired': overlay,
+        'apikey': api_key,
+        'language': language,
+    }
+    
+    with open(filename, 'rb') as f:
+        files = {
+            'file': f
+        }
+        r = requests.post(
+            'https://api.ocr.space/parse/image',
+            files=files,
+            data=payload,
+        )
+        
+    return r.content.decode()
 
 
 if __name__ == "__main__":

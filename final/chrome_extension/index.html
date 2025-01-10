@@ -10,10 +10,11 @@
     <div class="nav-container">
         <nav class="main-nav">
             <button id="dashboardButton">Dashboard</button>
-            <button id="fileUploadButton">File Upload</button>
+            <button id="fileUploadButton">File Malicious Detection</button>
             <button id="urlIpScanButton">URL/IP Scanning</button>
             <button id="reportIpUrlButton">URL/IP Reporting</button>
             <button id="QuizPageButton">Quiz Page</button>
+            <button id="imageExtractionButton">Phishing Text Analysis</button>
         </nav>
     </div>
 
@@ -302,6 +303,45 @@
                 </svg>
                 Play Again
             </button>
+        </div>
+    </div>
+
+    <div id="imageTextPage" class="page">
+        <div class="image-extraction-container">
+            <h2 class="page-title">Analyze Text from Image</h2>
+            
+            <div class="upload-section">
+                <div class="upload-area" id="imageDropZone">
+                    <div class="upload-content">
+                        <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24">
+                            <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                        </svg>
+                        <p class="upload-text">Drag & drop your image here or</p>
+                        <input type="file" id="imageFileInput" accept="image/*" hidden>
+                        <button class="upload-button" id="imageChooseBtn">Choose Image</button>
+                        <p class="file-name" id="imageFileName"></p>
+                    </div>
+                    <div class="preview-container" id="imagePreviewContainer"></div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="extract-button" id="extractTextBtn" disabled>
+                        <span class="button-content">
+                            Analyzing Text
+                            <span class="spinner" id="extractSpinner"></span>
+                        </span>
+                    </button>
+                    <button class="clear-button" id="clearImageBtn">Clear</button>
+                </div>
+            </div>
+
+            <div class="result-container" id="extractedTextContainer">
+                <div class="loading-container" id="extractLoadingContainer">
+                    <div class="loading-spinner"></div>
+                    <p>Analyzing text...</p>
+                </div>
+                <div class="text-content" id="extractedText"></div>
+            </div>
         </div>
     </div>
 

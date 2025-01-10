@@ -24,23 +24,20 @@ function hideSpinner(buttonId) {
 
 function showLoading(loadingId, resultId) {
     const loadingContainer = document.getElementById(loadingId);
-    const resultElement = document.getElementById(resultId);
-    resultElement.textContent = ''; // Clear previous results
-    resultElement.classList.remove('visible');
-    loadingContainer.style.display = 'block';
-    loadingContainer.classList.remove('fade-out');
+    const resultContainer = document.getElementById(resultId);
+    if (loadingContainer && resultContainer) {
+        loadingContainer.style.display = 'block';
+        resultContainer.style.display = 'none';
+    }
 }
 
 function hideLoading(loadingId, resultId) {
     const loadingContainer = document.getElementById(loadingId);
-    const resultElement = document.getElementById(resultId);
-    loadingContainer.classList.add('fade-out');
-    
-    setTimeout(() => {
+    const resultContainer = document.getElementById(resultId);
+    if (loadingContainer && resultContainer) {
         loadingContainer.style.display = 'none';
-        loadingContainer.classList.remove('fade-out');
-        resultElement.classList.add('visible');
-    }, 500);
+        resultContainer.style.display = 'block';
+    }
 }
 
 // Add these loading handler functions
@@ -160,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (e.target.files.length > 0) {
                 updateFileName(e.target.files[0]);
             }
-        });
+            });
     }
 });
 
@@ -207,6 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleReportSection('reportIpSection');
     });
     document.getElementById("QuizPageButton").addEventListener("click", () => showPage('QuizPage'));
+    document.getElementById("imageExtractionButton").addEventListener("click", () => showPage('imageTextPage'));
 
     // URL Scanning
     document.getElementById("scanUrlButton").addEventListener("click", () => {
@@ -221,13 +219,13 @@ document.addEventListener("DOMContentLoaded", () => {
         showSpinner('scanUrlButton');
         showUrlLoading();
 
-        fetch(`${API_BASE_URL}/api?url=${encodeURIComponent(url)}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.malicious === 'yes') {
-                    urlMaliciousCount += 1;
+            fetch(`${API_BASE_URL}/api?url=${encodeURIComponent(url)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.malicious === 'yes') {
+                        urlMaliciousCount += 1;
                     updateDashboard();
-                }
+                    }
                 setTimeout(() => {
                     urlScanResult.innerHTML = data.result
                         .replace(/\n/g, '<br>')
@@ -235,15 +233,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     hideSpinner('scanUrlButton');
                     hideUrlLoading();
                 }, 500); // Add slight delay for smoother transition
-            })
-            .catch(err => {
+                })
+                .catch(err => {
                 setTimeout(() => {
                     urlScanResult.textContent = "Error scanning URL.";
                     console.error(err);
                     hideSpinner('scanUrlButton');
                     hideUrlLoading();
                 }, 500);
-            });
+                });
     });
 
     // IP Scanning
@@ -259,13 +257,13 @@ document.addEventListener("DOMContentLoaded", () => {
         showSpinner('scanIpButton');
         showIpLoading();
 
-        fetch(`${API_BASE_URL}/api?ip=${encodeURIComponent(ip)}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.malicious === 'yes') {
-                    ipMaliciousCount += 1;
+            fetch(`${API_BASE_URL}/api?ip=${encodeURIComponent(ip)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.malicious === 'yes') {
+                        ipMaliciousCount += 1;
                     updateDashboard();
-                }
+                    }
                 setTimeout(() => {
                     ipScanResult.innerHTML = data.result
                         .replace(/\n/g, '<br>')
@@ -273,15 +271,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     hideSpinner('scanIpButton');
                     hideIpLoading();
                 }, 500); // Add slight delay for smoother transition
-            })
-            .catch(err => {
+                })
+                .catch(err => {
                 setTimeout(() => {
                     ipScanResult.textContent = "Error scanning IP.";
                     console.error(err);
                     hideSpinner('scanIpButton');
                     hideIpLoading();
                 }, 500);
-            });
+                });
     });
 
     // Report IP
@@ -296,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
         showSpinner('reportIpButton');
         showReportIpLoading();
-
+    
         fetch(`${API_BASE_URL}/report-ip`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -347,13 +345,13 @@ document.addEventListener("DOMContentLoaded", () => {
         showSpinner('reportUrlButton');
         showReportUrlLoading();
 
-        fetch(`${API_BASE_URL}/report-url`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url })
-        })
-            .then(response => response.json())
-            .then(data => {
+            fetch(`${API_BASE_URL}/report-url`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            })
+                .then(response => response.json())
+                .then(data => {
                 // Format the response to remove JSON structure
                 let message = '';
                 if (typeof data === 'object') {
@@ -370,12 +368,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 // Format the message with proper line breaks and styling
                 reportUrlResult.innerHTML = message
-                    .replace(/\n/g, '<br>')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            })
-            .catch(err => {
-                reportUrlResult.textContent = "Error reporting URL.";
-                console.error(err);
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                })
+                .catch(err => {
+                    reportUrlResult.textContent = "Error reporting URL.";
+                    console.error(err);
             })
             .finally(() => {
                 setTimeout(() => {
@@ -828,5 +826,139 @@ function updateActiveNavButton(pageId) {
         case 'QuizPage':
             document.getElementById('QuizPageButton').classList.add('active');
             break;
+        case 'imageTextPage':
+            document.getElementById('imageExtractionButton').classList.add('active');
+            break;
     }
 }
+
+// Image extraction functionality
+document.addEventListener('DOMContentLoaded', () => {
+    const imageFileInput = document.getElementById('imageFileInput');
+    const imageChooseBtn = document.getElementById('imageChooseBtn');
+    const imageDropZone = document.getElementById('imageDropZone');
+    const imageFileName = document.getElementById('imageFileName');
+    const extractTextBtn = document.getElementById('extractTextBtn');
+    const clearImageBtn = document.getElementById('clearImageBtn');
+    const extractedText = document.getElementById('extractedText');
+    const previewContainer = document.getElementById('imagePreviewContainer');
+
+    // Choose image button handler
+    imageChooseBtn.addEventListener('click', () => {
+        imageFileInput.click();
+    });
+
+    // File input change handler
+    imageFileInput.addEventListener('change', handleImageSelection);
+
+    // Drag and drop handlers
+    imageDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        imageDropZone.classList.add('dragover');
+    });
+
+    imageDropZone.addEventListener('dragleave', () => {
+        imageDropZone.classList.remove('dragover');
+    });
+
+    imageDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        imageDropZone.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+            imageFileInput.files = files;
+            handleImageSelection({ target: imageFileInput });
+        }
+    });
+
+    // Extract text button handler
+    extractTextBtn.addEventListener('click', async () => {
+        const file = imageFileInput.files[0];
+        if (!file) return;
+
+        try {
+            const loadingContainer = document.getElementById('extractLoadingContainer');
+            const resultContainer = document.getElementById('extractedTextContainer');
+            const resultElement = document.getElementById('extractedText');
+
+            // Show loading - This is incorrect
+            loadingContainer.style.display = 'flex';  // Should be 'flex'
+            resultContainer.style.display = 'none';    // Should not hide the container
+            showSpinner('extractText');
+            
+            const formData = new FormData();
+            formData.append('image', file);
+
+            // Debug log to check if file is being sent
+            console.log('Sending file:', file);
+
+            const response = await fetch(`${API_BASE_URL}/extract-image`, {
+                method: 'POST',
+                body: formData
+            });
+
+            // Debug log for response
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Raw server response:', data);
+
+            // Fix the visibility management
+            loadingContainer.style.display = 'none';
+            resultContainer.style.display = 'block';
+            
+            if (data.success) {
+                const analysis = data.analysis || 'No analysis available';
+                resultElement.innerHTML = data.analysis.replace(/\n/g, '<br>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            } else {
+                resultElement.textContent = data.error || 'Failed to extract text';
+            }
+        } catch (error) {
+            console.error('Extract text error:', error);
+            resultElement.textContent = `Error: ${error.message}`;
+        } finally {
+            loadingContainer.style.display = 'none';
+            hideSpinner('extractText');
+        }
+    });
+
+    // Clear button handler
+    clearImageBtn.addEventListener('click', clearImageExtraction);
+
+    function handleImageSelection(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            return;
+        }
+
+        imageFileName.textContent = file.name;
+        extractTextBtn.disabled = false;
+
+        // Show image preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            previewContainer.innerHTML = '';
+            previewContainer.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function clearImageExtraction() {
+        imageFileInput.value = '';
+        imageFileName.textContent = '';
+        extractTextBtn.disabled = true;
+        extractedText.textContent = '';
+        previewContainer.innerHTML = '';
+    }
+});
